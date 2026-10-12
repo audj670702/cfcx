@@ -1,0 +1,19 @@
+{
+  "_nota": "Programas del acervo en YouTube (catálogo actual de TV Digital Internet). Cada uno abre su lista de reproducción.",
+  "programas": [
+    { "nombre": "Acá Entre Nos", "playlist": "PL2WUtTdjOEIWkxEmT6cFT4kn4YBx-iuA3", "espacio": "comunidad" },
+    { "nombre": "Comunidad Deportiva", "playlist": "PL2WUtTdjOEIVxdwPMjsoKxt7n4d3x_uDe", "espacio": "deporte" },
+    { "nombre": "Corinto ST", "playlist": "PL2WUtTdjOEIX1w9PO8-Vctf5GX-jsDYbZ", "espacio": "musica" },
+    { "nombre": "Descubridores", "playlist": "PL2WUtTdjOEIULtb0WmkTSk_5GDOBTs2OC", "espacio": "cultura" },
+    { "nombre": "El Rincón del Problema", "playlist": "PL2WUtTdjOEIUS7ogetVkLbnql2kUIGc3M", "espacio": "comunidad" },
+    { "nombre": "El Show del Medio Tiempo", "playlist": "PL2WUtTdjOEIXG1x0II30AMiRg4qX-TWvc", "espacio": "deporte" },
+    { "nombre": "La Magia de Adler", "playlist": "PL2WUtTdjOEIWDR0a6ae-PV8odjHCy03p4", "espacio": "cultura" },
+    { "nombre": "La Talacha Deportes", "playlist": "PL2WUtTdjOEIWjH-9EmYcDbFxFDYJho-7X", "espacio": "deporte" },
+    { "nombre": "Lucifer Late Night Show", "playlist": "PL2WUtTdjOEIWyQia2JIXychKq6ZeKdUN0", "espacio": "comunidad" },
+    { "nombre": "Magazine TV", "playlist": "PL2WUtTdjOEIUfnGpVmCcwdcEuv9PEptFK", "espacio": "musica" },
+    { "nombre": "Pasión por el Fútbol", "playlist": "PL2WUtTdjOEIUyqskLQxny84PM9PE9TyEW", "espacio": "deporte" },
+    { "nombre": "Revista Ecológica", "playlist": "PL2WUtTdjOEIULdefjm2rOcNXtaqZCl_VT", "espacio": "cultura" },
+    { "nombre": "Tijera Política", "playlist": "PL2WUtTdjOEIXG1x0II30AMiRg4qX-TWvc", "espacio": "comunidad" },
+    { "nombre": "Viajando Ando", "playlist": "PL2WUtTdjOEIVxkMmidAs1HRdxGFXR1UsF", "espacio": "cultura" }
+  ]
+}

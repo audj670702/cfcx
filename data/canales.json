@@ -1,0 +1,10 @@
+{
+  "_nota": "Canal 01 usa la señal 24/7 definida en js/config.js. Los demás son canales virtuales: cada uno reproduce una lista de YouTube (playlist). Las listas actuales son EJEMPLOS tomados del catálogo de TV Digital Internet; cámbialas por las definitivas de cada Espacio.",
+  "canales": [
+    { "numero": "01", "id": "envivo", "nombre": "En vivo", "tipo": "hls", "espacio": null },
+    { "numero": "02", "id": "musica", "nombre": "Música", "tipo": "youtube", "playlist": "PL2WUtTdjOEIX1w9PO8-Vctf5GX-jsDYbZ", "espacio": "musica" },
+    { "numero": "03", "id": "deporte", "nombre": "Deporte", "tipo": "youtube", "playlist": "PL2WUtTdjOEIVxdwPMjsoKxt7n4d3x_uDe", "espacio": "deporte" },
+    { "numero": "04", "id": "cultura", "nombre": "Cultura", "tipo": "youtube", "playlist": "PL2WUtTdjOEIULtb0WmkTSk_5GDOBTs2OC", "espacio": "cultura" },
+    { "numero": "05", "id": "comunidad", "nombre": "Comunidad", "tipo": "youtube", "playlist": "PL2WUtTdjOEIWkxEmT6cFT4kn4YBx-iuA3", "espacio": "comunidad" }
+  ]
+}

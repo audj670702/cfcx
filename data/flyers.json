@@ -1,0 +1,9 @@
+{
+  "_nota": "Cada flyer puede llevar imagen (URL), enlace y fechas de vigencia (AAAA-MM-DD). Fuera de vigencia no se muestra.",
+  "flyers": [
+    { "titulo": "[Título del flyer 1]", "etiqueta": "Evento", "imagen": "", "enlace": "", "desde": "2026-01-01", "hasta": "2027-12-31" },
+    { "titulo": "[Título del flyer 2]", "etiqueta": "Promoción", "imagen": "", "enlace": "#/cupones", "desde": "2026-01-01", "hasta": "2027-12-31" },
+    { "titulo": "[Título del flyer 3]", "etiqueta": "Estreno", "imagen": "", "enlace": "", "desde": "2026-01-01", "hasta": "2027-12-31" },
+    { "titulo": "[Título del flyer 4]", "etiqueta": "Comunidad", "imagen": "", "enlace": "#/espacio/comunidad", "desde": "2026-01-01", "hasta": "2027-12-31" }
+  ]
+}

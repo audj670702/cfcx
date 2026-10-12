@@ -1,0 +1,36 @@
+{
+  "espacios": [
+    {
+      "id": "musica",
+      "nombre": "Música",
+      "canal": "02",
+      "descripcion": "Talentos musicales, entrevistas y presentaciones del canal.",
+      "talentos": ["[Talento 1]", "[Talento 2]", "[Talento 3]", "[Talento 4]"],
+      "programas": ["Corinto ST", "Magazine TV"]
+    },
+    {
+      "id": "deporte",
+      "nombre": "Deporte",
+      "canal": "03",
+      "descripcion": "Entrevistas, análisis y contenido deportivo.",
+      "talentos": ["[Invitado 1]", "[Invitado 2]", "[Invitado 3]"],
+      "programas": ["Comunidad Deportiva", "Pasión por el Fútbol", "La Talacha Deportes", "El Show del Medio Tiempo"]
+    },
+    {
+      "id": "cultura",
+      "nombre": "Cultura",
+      "canal": "04",
+      "descripcion": "Artistas, divulgación, viajes y expresiones culturales.",
+      "talentos": ["[Artista 1]", "[Artista 2]", "[Artista 3]"],
+      "programas": ["Descubridores", "Viajando Ando", "La Magia de Adler", "Revista Ecológica"]
+    },
+    {
+      "id": "comunidad",
+      "nombre": "Comunidad",
+      "canal": "05",
+      "descripcion": "Asociaciones con fines sociales: sus causas, avisos y enlaces.",
+      "talentos": ["[Asociación 1]", "[Asociación 2]", "[Asociación 3]"],
+      "programas": ["Acá Entre Nos", "El Rincón del Problema", "Tijera Política", "Lucifer Late Night Show"]
+    }
+  ]
+}

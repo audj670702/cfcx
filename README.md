@@ -8,15 +8,15 @@ HTML, CSS y JavaScript sin frameworks ni compilación. Se publica con GitHub Pag
 
 | Qué | Dónde |
 |---|---|
-| URL de la señal 24/7 (HLS) | `js/config.js` → `senal24.url` |
-| Canales y sus listas de YouTube | `data/canales.json` |
+| Canal CH00 propio de la EO (opcional) | `js/config.js` → `canalEO` |
+| Canales generales (CH01+) | Panel TV Digital de SCaD; consulta pública de solo lectura (`/_functions/tvdCanalesPublicos`) |
 | Espacios, talentos y programas por Espacio | `data/espacios.json` |
 | Flyers de la franja (con vigencia) | `data/flyers.json` |
 | Programas de la videoteca | `data/programas.json` |
 | Revista (artículos, exclusivos) | `data/articulos.json` |
 | Cupones de aliados | `data/cupones.json` |
 
-> Las listas de YouTube de los canales virtuales son **ejemplos** tomadas del catálogo actual de TV Digital Internet. Sustitúyelas por las definitivas.
+**Modelo de canales v2:** Panel TV reserva CH01 y CH02 para señales VPS HLS; CH03+ son canales virtuales con playlists YouTube. No se renumeran los códigos. CH00 solo existe si la EO lo configura en `js/config.js` y nunca se administra en Panel TV. La lista de respaldo `data/canales.json` refleja el panel al 2026-10-30 y se muestra únicamente cuando el endpoint Wix no responde. El frontend consulta el endpoint al iniciar, cada 2 minutos y al reactivar la pestaña. **Requisito de sincronización real:** publicar en Wix `backend/http-functions.js` con la función `get_tvdCanalesPublicos` del repositorio `scad-sys`.
 
 ## Pantallas (rutas)
 

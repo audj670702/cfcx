@@ -490,9 +490,11 @@
   function actualizarLeyendaCanales() {
     var el = document.getElementById('canalesEstado');
     if (!el) return;
-    el.textContent = origenCanales === 'RESPALDO'
-      ? 'Catálogo temporal: no se pudo consultar Panel TV Digital.'
-      : '';
+    el.textContent = origenCanales === 'CACHE'
+      ? 'Mostrando el último catálogo de Panel TV Digital (sin conexión).'
+      : origenCanales === 'SIN_CONEXION'
+        ? 'No se pudo consultar Panel TV Digital. Comprueba la conexión.'
+        : '';
   }
 
   function actualizarCatalogo(nuevo) {

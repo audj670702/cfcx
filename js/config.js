@@ -2,6 +2,8 @@
    Panel TV Digital (Wix) administra CH01..; CH00 es opcional y local a la EO.
 */
 window.CFCX_CONFIG = {
+  // Versión visible en la barra superior. Incrementar en cada publicación.
+  version: 'v0.1.0',
   canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanales',
   // Señales VPS de contingencia tomadas de la configuración confirmada en Panel TV.
   // Solo se usan cuando tvdCanales no proporciona una URL HLS válida.

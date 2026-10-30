@@ -2,7 +2,7 @@
    Panel TV Digital (Wix) administra CH01..; CH00 es opcional y local a la EO.
 */
 window.CFCX_CONFIG = {
-  canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanalesPublicos',
+  canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanales',
   // Opcional por EO. No se publica ni administra en Panel TV:
   // canalEO: { activo: true, codigo: 'CH00', nombre: 'Canal EO',
   //            tipo: 'VPS', rutaHls: 'https://servidor/eo/index.m3u8' },

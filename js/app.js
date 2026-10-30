@@ -138,13 +138,11 @@
 
   // ---------------------------------------------------------- piezas reutilizables
   function filaArticulo(a) {
-    var e = espacioPorId(a.espacio);
-    var bloqueado = a.exclusivo && !STORE.getSession();
-    return '<a class="row" href="#/espacio/' + esc(a.espacio) + '" data-art="' + esc(a.id) + '">' +
-      '<span class="thumb">' + (bloqueado ? I.lock : '[Foto]') + '</span>' +
-      '<span class="meta"><span class="kicker">' + esc(a.tipo) + (e ? ' · ' + esc(e.nombre) : '') +
-      (a.exclusivo ? ' · Exclusivo' : '') + '</span>' +
-      '<span class="title" style="display:block">' + esc(a.titulo) + '</span></span></a>';
+    return '<a class="row" href="#/articulo/' + encodeURIComponent(a.id) + '" data-art="' + esc(a.id) + '">' +
+      '<span class="thumb" style="width:64px;aspect-ratio:3/4;height:auto;overflow:visible">' + portadaRevista(a, 'mini') + '</span>' +
+      '<span class="meta"><span class="kicker">' + esc(a.tipo || 'Artículo') + '</span>' +
+      '<span class="title" style="display:block">' + esc(a.titulo) + '</span></span>' +
+      '<span class="chev">' + I.chev + '</span></a>';
   }
   function filaPrograma(p) {
     var e = espacioPorId(p.espacio);
@@ -172,54 +170,41 @@
   // ---------------------------------------------------------- pantallas
   var V = {};
 
+  // REVISTA: las portadas se componen aquí, no son capturas del video.
+  function portadaRevista(a, variante) {
+    return '<div class="portada-revista portada-' + (variante || 'normal') + '">' +
+      '<div class="portada-masthead">REVISTA <small>CANAL FORO CX</small></div>' +
+      '<div class="portada-foto">' + (a.portada ? '<img loading="lazy" src="' + esc(a.portada) + '" alt="">' : '<span>CFCX</span>') + '</div>' +
+      '<div class="portada-titular"><small>' + esc(a.tipo || 'ARTÍCULO') + '</small><strong>' + esc(a.titulo) + '</strong></div></div>';
+  }
+  function revistaSinArticulos() {
+    return '<div class="revista-vacia"><strong>' +
+      (DATA.revistaError ? 'No se pudo consultar REVISTA' : 'La primera edición está en preparación') +
+      '</strong><p>' + (DATA.revistaError ? 'Revisa la conexión con el servicio editorial.' :
+      'Las publicaciones aparecerán al publicarse en Wix Blog.') + '</p></div>';
+  }
+  function urlExterna(u) { return /^https:\/\//i.test(String(u || '')) ? String(u) : ''; }
+
   V.inicio = function () {
-    var flyers = (DATA.flyers || []).filter(vigente);
+    var primera = (DATA.articulos || [])[0];
     view.innerHTML =
       '<section class="section"><div id="monitor"></div><div id="canalesEstado" class="muted" style="font-size:12px;padding-top:8px"></div></section>' +
-      '<section class="section"><h2 class="eyebrow">Accesos rápidos</h2><div class="quick">' +
-        '<a href="#/espacios">' + I.grid + 'Espacios</a>' +
-        '<a href="#/revista">' + I.book + 'Revista</a>' +
-        '<a href="#/videoteca">' + I.play + 'Videoteca</a>' +
-        '<a href="#/arcade">' + I.game + 'Arcade</a>' +
-        '<a href="#/cupones">' + I.ticket + 'Cupones</a>' +
-        '<a href="#/espacio/comunidad">' + I.people + 'Comunidad</a>' +
-      '</div></section>' +
-      (flyers.length ? '<section class="section flyers" aria-label="Avisos"><div class="flyer-track" id="flyerTrack">' +
-        flyers.map(function (f, i) {
-          var inner = '<span class="flyer-img">' + (f.imagen ? '<img src="' + esc(f.imagen) + '" alt="">' : '[Flyer]') + '</span>' +
-            '<span><small>' + esc(f.etiqueta || 'Aviso') + ' · ' + (i + 1) + ' / ' + flyers.length + '</small><strong>' + esc(f.titulo) + '</strong></span>';
-          return f.enlace ? '<a class="flyer" href="' + esc(f.enlace) + '">' + inner + '</a>' : '<div class="flyer">' + inner + '</div>';
-        }).join('') +
-        '</div><div class="dots" aria-hidden="true">' + flyers.map(function (_, i) { return '<span' + (i === 0 ? ' class="on"' : '') + '></span>'; }).join('') + '</div></section>' : '');
-
+      '<section class="section revista-home"><div class="revista-head"><div><p class="eyebrow">PUBLICACIÓN EDITORIAL</p><h2 class="h1">REVISTA CFCX</h2></div>' +
+      '<a class="link-arrow" href="#/revista">Explorar ' + I.chev + '</a></div>' +
+      (primera
+      ? '<a class="revista-home-feature" href="#/articulo/' + encodeURIComponent(primera.id) + '">' +
+        portadaRevista(primera, 'home') + '<div><p class="eyebrow">' + esc(primera.tipo || 'ARTÍCULO') +
+        '</p><h3>' + esc(primera.titulo) + '</h3><p class="muted">' + esc(primera.resumen || '') + '</p>' +
+        '<span class="link-arrow">Leer artículo ' + I.chev + '</span></div></a>'
+      : '<div class="revista-vacia"><strong>Próxima edición de REVISTA CFCX</strong>' +
+        '<p>Las publicaciones aparecerán aquí cuando estén disponibles en Wix Blog.</p></div>') +
+      '</section>';
     var mon = new window.CFCXMonitor(document.getElementById('monitor'), {
       canales: DATA.canales, inicial: '01', mostrarCanales: true
     });
     monitorActual = mon;
     limpieza.push(function () { if (monitorActual === mon) monitorActual = null; mon.destroy(); });
     actualizarLeyendaCanales();
-
-    // Franja de flyers: avance automático; se pausa al tocarla
-    var track = document.getElementById('flyerTrack');
-    if (track && flyers.length > 1) {
-      var dots = view.querySelectorAll('.dots span');
-      var actual = 0, pausa = false;
-      var marcar = function () {
-        var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
-        actual = i;
-        for (var k = 0; k < dots.length; k++) dots[k].classList.toggle('on', k === i);
-      };
-      track.addEventListener('scroll', function () { window.requestAnimationFrame(marcar); }, { passive: true });
-      var pausar = function () { pausa = true; clearTimeout(track._t); track._t = setTimeout(function () { pausa = false; }, 8000); };
-      track.addEventListener('pointerdown', pausar);
-      track.addEventListener('touchstart', pausar, { passive: true });
-      var timer = setInterval(function () {
-        if (pausa || document.hidden) return;
-        var sig = (actual + 1) % flyers.length;
-        track.scrollTo({ left: sig * (track.clientWidth + 10), behavior: 'smooth' });
-      }, (CFG.flyerIntervalo || 5) * 1000);
-      limpieza.push(function () { clearInterval(timer); clearTimeout(track._t); });
-    }
   };
 
   V.espacios = function () {
@@ -286,10 +271,98 @@
   };
 
   V.revista = function () {
+    var todos = DATA.articulos || [], lista = todos.slice(), indice = 0, manual = false;
     view.innerHTML = '<section class="section"><a class="back" href="#/inicio">' + I.back + 'Inicio</a>' +
-      '<h1 class="h1">Revista</h1><p class="lead">Entrevistas, talentos, invitados y comunidad.</p></section>' +
-      '<section class="section"><div class="list">' + (DATA.articulos || []).map(filaArticulo).join('') + '</div></section>';
-    enlazarProgramas(view);
+      '<p class="eyebrow">PUBLICACIÓN EDITORIAL · CANAL FORO CX</p><h1 class="h1">REVISTA</h1>' +
+      '<p class="lead">Entrevistas, reseñas y artículos derivados de nuestros programas.</p></section>' +
+      (todos.length
+       ? '<section class="section"><div class="revista-head"><h2 class="eyebrow">ÚLTIMAS PUBLICACIONES</h2>' +
+         '<span class="muted" id="revistaCuenta"></span></div>' +
+         '<div class="revista-carrusel"><button type="button" data-mover="-1" aria-label="Portada anterior">' + I.back +
+         '</button><div id="revistaDestacada"></div><button type="button" data-mover="1" aria-label="Portada siguiente">' +
+         I.chev + '</button></div></section>' +
+         '<section class="section"><div class="search-wrap">' + I.search +
+         '<input type="search" class="search" id="buscarRevista" placeholder="Buscar artículos, temas o programas" aria-label="Buscar en Revista"></div>' +
+         '<h2 class="eyebrow" style="margin-top:22px">HEMEROTECA</h2>' +
+         '<div id="revistaTira" class="revista-tira" aria-label="Portadas de artículos"></div></section>'
+       : '<section class="section">' + revistaSinArticulos() + '</section>');
+    if (!todos.length) return;
+    function pintar() {
+      var destino = document.getElementById('revistaDestacada'), tira = document.getElementById('revistaTira');
+      if (!lista.length) {
+        destino.innerHTML = '<p class="muted">Sin coincidencias.</p>';
+        tira.innerHTML = '';
+        document.getElementById('revistaCuenta').textContent = '0 resultados';
+        return;
+      }
+      var x = lista[indice];
+      destino.innerHTML = '<a href="#/articulo/' + encodeURIComponent(x.id) + '">' + portadaRevista(x, 'grande') +
+        '</a><p class="revista-destacada-titulo">' + esc(x.titulo) + '</p>';
+      document.getElementById('revistaCuenta').textContent = (indice + 1) + ' / ' + lista.length;
+      tira.innerHTML = lista.map(function (p, i) {
+        return '<button type="button" data-elegir="' + i + '" aria-label="Seleccionar: ' + esc(p.titulo) +
+          '" aria-pressed="' + (indice === i) + '" class="revista-miniatura' + (indice === i ? ' activa' : '') + '">' +
+          portadaRevista(p, 'mini') + '</button>';
+      }).join('');
+    }
+    pintar();
+    view.addEventListener('click', function (e) {
+      var mover = e.target.closest('[data-mover]'), elegir = e.target.closest('[data-elegir]');
+      if (!mover && !elegir) return;
+      manual = true;
+      if (elegir) indice = +elegir.getAttribute('data-elegir');
+      else if (lista.length) indice = (indice + +mover.getAttribute('data-mover') + lista.length) % lista.length;
+      pintar();
+    });
+    document.getElementById('buscarRevista').addEventListener('input', function (e) {
+      manual = true;
+      var q = norm(e.target.value);
+      lista = todos.filter(function (p) {
+        return norm([p.titulo, p.resumen, p.tipo, p.espacio, p.programa].join(' ')).indexOf(q) >= 0;
+      });
+      indice = 0;
+      pintar();
+    });
+    if (todos.length > 1) {
+      var timer = setInterval(function () {
+        if (manual || document.hidden) return;
+        indice = (indice + 1) % Math.min(5, lista.length);
+        pintar();
+      }, 6000);
+      limpieza.push(function () { clearInterval(timer); });
+    }
+  };
+
+  V.articulo = function (id) {
+    var x = (DATA.articulos || []).filter(function (a) { return a.id === id; })[0];
+    if (!x) { location.hash = '#/revista'; return; }
+    var audio = urlExterna(x.audioUrl), video = urlExterna(x.programaUrl);
+    var fotos = Array.isArray(x.fotografias) ? x.fotografias : [];
+    var bloques = Array.isArray(x.bloques) && x.bloques.length ? x.bloques :
+      String(x.texto || x.resumen || '').split(/\n\s*\n/).filter(Boolean).map(function (t) { return { tipo: 'parrafo', texto: t }; });
+    var cuerpo = bloques.map(function (b) {
+      var t = esc(b.texto || '');
+      if (b.tipo === 'subtitulo') return '<h2>' + t + '</h2>';
+      if (b.tipo === 'cita') return '<blockquote>' + t + '</blockquote>';
+      if (b.tipo === 'imagen' && urlExterna(b.url)) return '<figure><img loading="lazy" src="' + esc(b.url) +
+        '" alt="' + esc(b.alt || '') + '"><figcaption>' + esc(b.pie || '') + '</figcaption></figure>';
+      return t ? '<p>' + t + '</p>' : '';
+    }).join('');
+    view.innerHTML = '<article class="section revista-lectura"><a class="back" href="#/revista">' +
+      I.back + 'Revista</a>' + portadaRevista(x, 'articulo') +
+      '<p class="eyebrow">' + esc(x.tipo || 'ARTÍCULO') + '</p><h1 class="h1">' + esc(x.titulo) + '</h1>' +
+      (audio ? '<div class="revista-audio"><strong>Escuchar este artículo</strong><audio controls preload="none" src="' +
+        esc(audio) + '"></audio></div>' : '') +
+      '<div class="revista-cuerpo">' + cuerpo + '</div>' +
+      (fotos.length ? '<div class="revista-fotos">' + fotos.map(function (f) {
+        var u = urlExterna(typeof f === 'string' ? f : f.url);
+        return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer"><img loading="lazy" src="' +
+          esc(u) + '" alt=""></a>' : '';
+      }).join('') + '</div>' : '') +
+      (video ? '<div class="revista-fuente"><small>PROGRAMA DE ORIGEN</small><strong>' +
+        esc(x.programa || 'Canal Foro CX') + '</strong><a class="link-arrow" href="' + esc(video) +
+        '" target="_blank" rel="noopener noreferrer">Consultar programa original ' + I.chev + '</a></div>' : '') +
+      '</article>';
   };
 
   V.videoteca = function () {
@@ -481,7 +554,7 @@
   };
 
   // ---------------------------------------------------------- router
-  var TABS = { buscar: 'buscar', arcade: 'arcade', mi: 'mi' };
+  var TABS = { revista: 'revista', articulo: 'revista', videoteca: 'videoteca', arcade: 'arcade', mi: 'mi' };
 
   function router() {
     while (limpieza.length) { try { limpieza.pop()(); } catch (e) {} }
@@ -494,6 +567,7 @@
     if (!V[ruta]) ruta = 'inicio';
 
     if (ruta === 'espacio') V.espacio(partes[1], partes[2]);
+    else if (ruta === 'articulo') V.articulo(decodeURIComponent(partes[1] || ''));
     else V[ruta]();
 
     var activa = TABS[ruta] || 'inicio';
@@ -540,21 +614,29 @@
     });
   }
 
+  // El catálogo es público y filtrado en el backend de Wix; nunca exponer tokens.
+  function cargarRevista() {
+    if (!CFG.revistaApiUrl) return Promise.resolve({ articulos: [] });
+    return cargar(CFG.revistaApiUrl).then(function (x) {
+      if (!x || !Array.isArray(x.articulos)) throw new Error('REVISTA_FORMATO');
+      return x;
+    }).catch(function () { return { articulos: [], error: true }; });
+  }
   pintarBotonTema();
   pintarSesion();
   view.innerHTML = '<section class="section"><p class="muted">Cargando…</p></section>';
 
   Promise.all([
-    window.CFCX_CANALES.cargarInicial(CFG), cargar(CFG.datos.espacios), cargar(CFG.datos.flyers),
-    cargar(CFG.datos.programas), cargar(CFG.datos.articulos), cargar(CFG.datos.cupones)
+    window.CFCX_CANALES.cargarInicial(CFG), cargar(CFG.datos.espacios),
+    cargar(CFG.datos.programas), cargar(CFG.datos.cupones), cargarRevista()
   ]).then(function (r) {
     DATA.canales = r[0].canales;
     origenCanales = r[0].origen;
     DATA.espacios = r[1].espacios;
-    DATA.flyers = r[2].flyers;
-    DATA.programas = r[3].programas;
+    DATA.programas = r[2].programas;
+    DATA.cupones = r[3].cupones;
     DATA.articulos = r[4].articulos;
-    DATA.cupones = r[5].cupones;
+    DATA.revistaError = !!r[4].error;
     window.addEventListener('hashchange', router);
     router();
     // Refresca desde la fuente oficial sin reiniciar la navegación.

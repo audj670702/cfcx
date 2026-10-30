@@ -9,14 +9,14 @@ HTML, CSS y JavaScript sin frameworks ni compilación. Se publica con GitHub Pag
 | Qué | Dónde |
 |---|---|
 | Canal CH00 propio de la EO (opcional) | `js/config.js` → `canalEO` |
-| Canales generales (CH01+) | Panel TV Digital de SCaD; consulta pública de solo lectura (`/_functions/tvdCanalesPublicos`) |
+| Canales generales (CH01+) | Panel TV Digital de SCaD; consulta pública de solo lectura (`/_functions/tvdCanales`) |
 | Espacios, talentos y programas por Espacio | `data/espacios.json` |
 | Flyers de la franja (con vigencia) | `data/flyers.json` |
 | Programas de la videoteca | `data/programas.json` |
 | Revista (artículos, exclusivos) | `data/articulos.json` |
 | Cupones de aliados | `data/cupones.json` |
 
-**Modelo de canales v2:** Panel TV reserva CH01 y CH02 para señales VPS HLS; CH03+ son canales virtuales con playlists YouTube. No se renumeran los códigos. CH00 solo existe si la EO lo configura en `js/config.js` y nunca se administra en Panel TV. La lista de respaldo `data/canales.json` refleja el panel al 2026-10-30 y se muestra únicamente cuando el endpoint Wix no responde. El frontend consulta el endpoint al iniciar, cada 2 minutos y al reactivar la pestaña. **Requisito de sincronización real:** publicar en Wix `backend/http-functions.js` con la función `get_tvdCanalesPublicos` del repositorio `scad-sys`.
+**Modelo de canales v2:** Panel TV reserva CH01 y CH02 para señales VPS HLS; CH03+ son canales virtuales con playlists YouTube. No se renumeran los códigos. CH00 solo existe si la EO lo configura en `js/config.js` y nunca se administra en Panel TV. El archivo `data/canales.json` queda únicamente como referencia histórica y **no** determina los canales del monitor. Ante una falla de red, se utiliza el último catálogo oficial guardado por un máximo de 24 horas; si no existe, el monitor indica que no hay conexión. El frontend consulta el endpoint al iniciar, cada 2 minutos y al reactivar la pestaña. **Sin nueva función Wix:** se reutiliza el endpoint existente `GET https://www.scad.mx/_functions/tvdCanales`, implementado en `backend/tvdPublico.js` y expuesto por el `http-functions.js` vigente.
 
 ## Pantallas (rutas)
 

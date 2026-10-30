@@ -8,6 +8,8 @@
   var STORE = window.CFCX_STORE;
   var view = document.getElementById('view');
   var DATA = {};
+  var monitorActual = null;
+  var origenCanales = '';
   var limpieza = []; // funciones a ejecutar al salir de una pantalla
 
   // ---------------------------------------------------------- utilidades
@@ -158,7 +160,7 @@
   V.inicio = function () {
     var flyers = (DATA.flyers || []).filter(vigente);
     view.innerHTML =
-      '<section class="section"><div id="monitor"></div></section>' +
+      '<section class="section"><div id="monitor"></div><div id="canalesEstado" class="muted" style="font-size:12px;padding-top:8px"></div></section>' +
       '<section class="section"><h2 class="eyebrow">Accesos rápidos</h2><div class="quick">' +
         '<a href="#/espacios">' + I.grid + 'Espacios</a>' +
         '<a href="#/revista">' + I.book + 'Revista</a>' +
@@ -176,9 +178,11 @@
         '</div><div class="dots" aria-hidden="true">' + flyers.map(function (_, i) { return '<span' + (i === 0 ? ' class="on"' : '') + '></span>'; }).join('') + '</div></section>' : '');
 
     var mon = new window.CFCXMonitor(document.getElementById('monitor'), {
-      canales: DATA.canales, senal24: CFG.senal24, inicial: '01', mostrarCanales: true
+      canales: DATA.canales, inicial: '01', mostrarCanales: true
     });
-    limpieza.push(function () { mon.destroy(); });
+    monitorActual = mon;
+    limpieza.push(function () { if (monitorActual === mon) monitorActual = null; mon.destroy(); });
+    actualizarLeyendaCanales();
 
     // Franja de flyers: avance automático; se pausa al tocarla
     var track = document.getElementById('flyerTrack');
@@ -247,9 +251,10 @@
         '<button type="button" class="btn ghost block" style="margin-top:12px" id="comparte">Comparte con CFCX</button></div></section>';
 
     var mon = new window.CFCXMonitor(document.getElementById('monitor'), {
-      canales: DATA.canales, senal24: CFG.senal24, inicial: e.canal, mostrarCanales: false
+      canales: DATA.canales, inicial: e.canal, mostrarCanales: false
     });
-    limpieza.push(function () { mon.destroy(); });
+    monitorActual = mon;
+    limpieza.push(function () { if (monitorActual === mon) monitorActual = null; mon.destroy(); });
 
     view.querySelector('.tabs').addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-tab]');
@@ -481,6 +486,26 @@
     window.scrollTo(0, 0);
   }
 
+  // ---------------------------------------------------------- catálogo general CH01+ (CH00 opcional por EO)
+  function actualizarLeyendaCanales() {
+    var el = document.getElementById('canalesEstado');
+    if (!el) return;
+    el.textContent = origenCanales === 'RESPALDO'
+      ? 'Catálogo temporal: no se pudo consultar Panel TV Digital.'
+      : '';
+  }
+
+  function actualizarCatalogo(nuevo) {
+    if (!nuevo || !Array.isArray(nuevo.canales)) return;
+    var anterior = JSON.stringify(DATA.canales || []);
+    DATA.canales = nuevo.canales;
+    origenCanales = nuevo.origen;
+    actualizarLeyendaCanales();
+    if (monitorActual && anterior !== JSON.stringify(DATA.canales)) {
+      monitorActual.actualizarCanales(DATA.canales);
+    }
+  }
+
   // ---------------------------------------------------------- arranque
   function cargar(url) {
     return fetch(url, { cache: 'no-cache' }).then(function (r) {
@@ -494,10 +519,11 @@
   view.innerHTML = '<section class="section"><p class="muted">Cargando…</p></section>';
 
   Promise.all([
-    cargar(CFG.datos.canales), cargar(CFG.datos.espacios), cargar(CFG.datos.flyers),
+    window.CFCX_CANALES.cargarInicial(CFG), cargar(CFG.datos.espacios), cargar(CFG.datos.flyers),
     cargar(CFG.datos.programas), cargar(CFG.datos.articulos), cargar(CFG.datos.cupones)
   ]).then(function (r) {
     DATA.canales = r[0].canales;
+    origenCanales = r[0].origen;
     DATA.espacios = r[1].espacios;
     DATA.flyers = r[2].flyers;
     DATA.programas = r[3].programas;
@@ -505,6 +531,15 @@
     DATA.cupones = r[5].cupones;
     window.addEventListener('hashchange', router);
     router();
+    // Refresca desde la fuente oficial sin reiniciar la navegación.
+    setInterval(function () {
+      window.CFCX_CANALES.desdePanel(CFG).then(actualizarCatalogo).catch(function () {
+        // Mantener último catálogo válido; nunca revertir a un respaldo viejo.
+      });
+    }, 120000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) window.CFCX_CANALES.desdePanel(CFG).then(actualizarCatalogo).catch(function () {});
+    });
   }).catch(function () {
     view.innerHTML = '<section class="section"><div class="box"><strong>No se pudo cargar el contenido.</strong><p>Revisa tu conexión e intenta de nuevo.</p></div></section>';
   });

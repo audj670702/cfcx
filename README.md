@@ -50,3 +50,12 @@ js/app.js             rutas y pantallas
 data/*.json           contenido editable
 service-worker.js     PWA (no guarda la señal en vivo)
 ```
+
+
+## REVISTA CFCX · Primera etapa (rama de revisión)
+
+El monitor de Inicio y el servicio de canales permanecen intactos. Se pausan los accesos rápidos y el carrusel de flyers. REVISTA se convierte en la segunda sección de Inicio y se añade a la barra inferior con Videoteca.
+
+REVISTA dispone de portadas retro compuestas en la app, carrusel automático de las cinco publicaciones recientes, hemeroteca desplazable, filtro de búsqueda y lectura editorial con fotografías, audio opcional y enlace complementario al programa de origen.
+
+Fuente exclusiva prevista: Wix Blog de SCaD; se han retirado los artículos de demostración del flujo de carga. La propiedad \`revistaApiUrl\` de \`js/config.js\` permanece en null hasta que esté disponible un endpoint Wix público, autorizado y filtrado para CFCX. El endpoint debe devolver \`{ "articulos": [...] }\` con \`id, titulo, tipo, resumen, portada, texto/bloques, audioUrl, fotografias, programa, programaUrl, espacio\`. El navegador no debe usar claves Wix. Sin publicaciones se muestra un estado vacío real.

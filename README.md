@@ -8,6 +8,12 @@ HTML, CSS y JavaScript sin frameworks ni compilación. Se publica con GitHub Pag
 
 La barra superior muestra de forma permanente la versión debajo del nombre **CANAL FORO CX** (versión inicial visible: `v0.1.0`). La versión se define únicamente en `js/config.js`, propiedad `version`; `js/app.js` la presenta mediante `#appVersion`. Incrementar `version` al publicar cambios. Se actualizó la caché de la PWA a `cfcx-v4` para servir el nuevo diseño.
 
+## Monitor TV · diseño CPC (v0.1.1)
+
+El monitor de CFCX adopta el **modelo visual CPC** (referencia `CPC-eLearning/cpc-tv.js` y `cpc-tv.css` v0.5.35): marco azul oscuro, imagen horizontal 16:9, identificación CH/nombre sobre video, barra inferior compacta con sonido / selección de canales / ampliación, menú desplegable con canal seleccionado, indicador de carga y estática al cambiar. En iPhone, ofrece pantalla completa dentro de la app cuando no está disponible la API nativa.
+
+Se conserva el reproductor de CFCX y la fuente de datos `/_functions/tvdCanales`: CH01–CH02 VPS HLS, CH03+ YouTube; CH00 solo si la EO lo configuró en `js/config.js`. Los Espacios usan el mismo monitor, sin menú de canales en la vista particular. La versión visible es `v0.1.1` y la caché PWA `cfcx-v5`.
+
 ## Qué cambiar sin tocar código
 
 | Qué | Dónde |

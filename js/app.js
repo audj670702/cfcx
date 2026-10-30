@@ -31,9 +31,16 @@
   }
   // Panel TV es la única fuente de asociación canal-espacio.
   function canalPorEspacio(id) {
-    return (DATA.canales || []).filter(function (c) {
+    var canales = DATA.canales || [];
+    var asignado = canales.filter(function (c) {
       return String(c.espacio || '').trim().toLowerCase() === String(id || '').trim().toLowerCase();
-    })[0] || null;
+    })[0];
+    if (asignado) return asignado;
+    // Compatibilidad si el servicio público no incluye el campo espacio.
+    var espacio = espacioPorId(id);
+    return espacio ? canales.filter(function (c) {
+      return norm(c.nombre) === norm(espacio.nombre);
+    })[0] || null : null;
   }
   var toastTimer;
   function toast(msg) {

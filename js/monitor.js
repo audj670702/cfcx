@@ -23,15 +23,14 @@
   /**
    * @param {HTMLElement} root  contenedor donde se dibuja el monitor
    * @param {object} opts
-   *   canales: lista de canales (data/canales.json)
-   *   senal24: { nombre, url } de config
+   *   canales: catálogo público TV Digital normalizado
+   *   Cada canal VPS lleva su URL HLS propia (rutaHls en Panel TV).
    *   inicial: número de canal inicial ("01")
    *   mostrarCanales: muestra la fila de canales y el enlace al Espacio
    */
   function Monitor(root, opts) {
     this.root = root;
     this.canales = opts.canales || [];
-    this.senal24 = opts.senal24 || {};
     this.mostrarCanales = opts.mostrarCanales !== false;
     this.muted = true;
     this.hls = null;
@@ -42,7 +41,8 @@
     }
     this.idx = idx;
     this.render();
-    this.sintonizar(this.idx, false);
+    if (this.canales.length) this.sintonizar(this.idx, false);
+    else this.mensaje('Sin canales activos', 'El catálogo no tiene canales disponibles.');
   }
 
   Monitor.prototype.render = function () {
@@ -126,10 +126,10 @@
 
     this.el.osd.textContent = 'CH ' + c.numero;
     this.el.live.hidden = c.tipo !== 'hls';
-    var nombre = c.tipo === 'hls' ? (this.senal24.nombre || 'Señal 24/7') : 'Canal ' + c.nombre;
+    var nombre = c.nombre;
     this.el.now.innerHTML = '<b>' + esc(nombre) + '</b>';
 
-    if (c.tipo === 'hls') this.montarHls();
+    if (c.tipo === 'hls') this.montarHls(c);
     else if (c.tipo === 'youtube') this.montarYoutube(c);
     else this.mensaje('Canal en preparación', 'Muy pronto en CFCX');
 
@@ -146,11 +146,11 @@
     }
   };
 
-  Monitor.prototype.montarHls = function () {
+  Monitor.prototype.montarHls = function (canal) {
     var self = this;
-    var url = this.senal24.url;
+    var url = canal.url;
     this._reintento = false;
-    if (!url) { this.mensaje('Señal no configurada', 'Define la URL en js/config.js'); return; }
+    if (!url) { this.mensaje('Señal no configurada', 'Falta la URL HLS del canal en Panel TV.'); return; }
 
     var v = document.createElement('video');
     v.setAttribute('playsinline', '');
@@ -237,6 +237,18 @@
       if (s.webkitRequestFullscreen) { s.webkitRequestFullscreen(); return; }
       if (m && m.webkitEnterFullscreen) { m.webkitEnterFullscreen(); }
     } catch (e) {}
+  };
+
+  Monitor.prototype.actualizarCanales = function (canales) {
+    var codigoActual = this.canales[this.idx] && this.canales[this.idx].codigo;
+    this.limpiarMedia();
+    this.root.removeEventListener('click', this.onClick);
+    this.canales = Array.isArray(canales) ? canales : [];
+    var indice = this.canales.findIndex(function (c) { return c.codigo === codigoActual; });
+    this.idx = indice >= 0 ? indice : 0;
+    this.render();
+    if (this.canales.length) this.sintonizar(this.idx, false);
+    else this.mensaje('Sin canales activos', 'El catálogo no tiene canales disponibles.');
   };
 
   Monitor.prototype.destroy = function () {

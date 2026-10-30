@@ -545,6 +545,9 @@
         router();
       });
     }
+    // Conserva el acceso a cupones tras retirar los accesos rápidos de Inicio.
+    document.getElementById('tema').closest('.section').insertAdjacentHTML('beforebegin',
+      '<section class="section"><a class="link-arrow" href="#/cupones">Promociones y cupones ' + I.chev + '</a></section>');
     document.getElementById('tema').addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-theme]');
       if (!b) return;

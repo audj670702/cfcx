@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  function listaCanonica(items, canalEO) {
+  function listaCanonica(items, canalEO, senalesVpsRespaldo) {
     if (!Array.isArray(items)) throw new Error('CATALOGO_INVALIDO');
     var vistos = {};
     var canales = items.map(function (item) {
@@ -20,6 +20,11 @@
       // El catálogo general reserva CH01/CH02 para VPS y CH03+ para YouTube.
       if ((n <= 2 && tipo !== 'VPS') || (n >= 3 && tipo !== 'VIRTUAL')) return null;
       var url = String(item.rutaHls || item.url || '').trim();
+      // Si el listado público no incluye rutaHls, recuperar la señal VPS
+      // previamente registrada para este canal. No modifica la señal en el VPS.
+      if (tipo === 'VPS' && !/^https:\/\//i.test(url)) {
+        url = String(senalesVpsRespaldo && senalesVpsRespaldo[codigo] || '').trim();
+      }
       var playlist = String(item.playlistYoutube || item.playlist || '').trim();
       var idEnUrl = /[?&]list=([a-zA-Z0-9_-]+)/.exec(playlist);
       if (idEnUrl) playlist = idEnUrl[1];
@@ -74,11 +79,11 @@
       if (dato && Array.isArray(dato.canales) && Number.isFinite(Number(dato.guardado)) &&
           Date.now() - Number(dato.guardado) <= CACHE_TTL_MS &&
           Number(dato.guardado) <= Date.now()) {
-        return { canales: listaCanonica(dato.canales, cfg.canalEO), origen: 'CACHE' };
+        return { canales: listaCanonica(dato.canales, cfg.canalEO, cfg.senalesVpsRespaldo), origen: 'CACHE' };
       }
     } catch (_) {}
     // Sin datos vigentes, mejor mostrar "sin conexión" que canales incorrectos.
-    return { canales: listaCanonica([], cfg.canalEO), origen: 'SIN_CONEXION' };
+    return { canales: listaCanonica([], cfg.canalEO, cfg.senalesVpsRespaldo), origen: 'SIN_CONEXION' };
   }
 
   function remoto(cfg) {
@@ -91,7 +96,7 @@
         if (!datos || datos.ok !== true || !Array.isArray(datos.canales)) {
           throw new Error('RESPUESTA_INVALIDA');
         }
-        var canales = listaCanonica(datos.canales, cfg.canalEO);
+        var canales = listaCanonica(datos.canales, cfg.canalEO, cfg.senalesVpsRespaldo);
         // Una respuesta correcta sin canales significa que no hay canales activos.
         guardarCache(datos.canales);
         return { canales: canales, origen: 'PANEL_TV' };

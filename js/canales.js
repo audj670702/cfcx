@@ -53,6 +53,34 @@
     return canales;
   }
 
+  // Solo guarda el último catálogo oficial, nunca datos de demostración.
+  var CACHE_KEY = 'cfcx.canalesPanelTv';
+  var CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+  function guardarCache(canales) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        guardado: Date.now(),
+        canales: canales
+      }));
+    } catch (_) {
+      // La política de almacenamiento del navegador puede impedir guardar.
+    }
+  }
+
+  function recuperarCache(cfg) {
+    try {
+      var dato = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (dato && Array.isArray(dato.canales) && Number.isFinite(Number(dato.guardado)) &&
+          Date.now() - Number(dato.guardado) <= CACHE_TTL_MS &&
+          Number(dato.guardado) <= Date.now()) {
+        return { canales: listaCanonica(dato.canales, cfg.canalEO), origen: 'CACHE' };
+      }
+    } catch (_) {}
+    // Sin datos vigentes, mejor mostrar "sin conexión" que canales incorrectos.
+    return { canales: listaCanonica([], cfg.canalEO), origen: 'SIN_CONEXION' };
+  }
+
   function remoto(cfg) {
     if (!cfg.canalesPublicosUrl) return Promise.reject(new Error('URL_NO_CONFIGURADA'));
     return fetch(cfg.canalesPublicosUrl, { cache: 'no-store', mode: 'cors' })
@@ -63,17 +91,10 @@
         if (!datos || datos.ok !== true || !Array.isArray(datos.canales)) {
           throw new Error('RESPUESTA_INVALIDA');
         }
-        return { canales: listaCanonica(datos.canales, cfg.canalEO), origen: 'PANEL_TV' };
-      });
-  }
-
-  function respaldo(cfg) {
-    return fetch(cfg.datos.canales, { cache: 'no-cache' })
-      .then(function (respuesta) {
-        if (!respuesta.ok) throw new Error('SIN_RESPALDO');
-        return respuesta.json();
-      }).then(function (datos) {
-        return { canales: listaCanonica(datos.canales, cfg.canalEO), origen: 'RESPALDO' };
+        var canales = listaCanonica(datos.canales, cfg.canalEO);
+        // Una respuesta correcta sin canales significa que no hay canales activos.
+        guardarCache(datos.canales);
+        return { canales: canales, origen: 'PANEL_TV' };
       });
   }
 
@@ -81,8 +102,8 @@
     desdePanel: remoto,
     cargarInicial: function (cfg) {
       return remoto(cfg).catch(function (error) {
-        console.warn('CFCX: catálogo Wix no disponible; usando respaldo temporal.', error.message);
-        return respaldo(cfg);
+        console.warn('CFCX: no se pudo consultar Panel TV Digital; usando último catálogo oficial si existe.', error.message);
+        return recuperarCache(cfg);
       });
     },
     // Expuesto para pruebas y verificación de reglas de numeración.

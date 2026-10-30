@@ -29,6 +29,12 @@
   function espacioPorId(id) {
     return (DATA.espacios || []).filter(function (e) { return e.id === id; })[0];
   }
+  // Panel TV es la única fuente de asociación canal-espacio.
+  function canalPorEspacio(id) {
+    return (DATA.canales || []).filter(function (c) {
+      return String(c.espacio || '').trim().toLowerCase() === String(id || '').trim().toLowerCase();
+    })[0] || null;
+  }
   var toastTimer;
   function toast(msg) {
     var t = document.getElementById('toast');
@@ -212,13 +218,16 @@
       '<h1 class="h1">Espacios</h1><p class="lead">Cada Espacio tiene su canal, su revista y su comunidad.</p></section>' +
       '<section class="section"><div class="space-grid">' +
       (DATA.espacios || []).map(function (e) {
-        return '<a class="space-card" href="#/espacio/' + esc(e.id) + '"><span class="mono">CH ' + esc(e.canal) + '</span><strong>' + esc(e.nombre) + '</strong><span>' + esc(e.descripcion) + '</span></a>';
+        var canal = canalPorEspacio(e.id);
+        var leyenda = canal ? 'CH ' + esc(canal.numero) : 'SIN CANAL ACTIVO';
+        return '<a class="space-card" href="#/espacio/' + esc(e.id) + '"><span class="mono">' + leyenda + '</span><strong>' + esc(e.nombre) + '</strong><span>' + esc(e.descripcion) + '</span></a>';
       }).join('') + '</div></section>';
   };
 
   V.espacio = function (id, tab) {
     var e = espacioPorId(id);
     if (!e) { location.hash = '#/espacios'; return; }
+    var canalEspacio = canalPorEspacio(id);
     tab = tab || 'revista';
     var arts = (DATA.articulos || []).filter(function (a) { return a.espacio === id; });
     var progs = (DATA.programas || []).filter(function (p) { return p.espacio === id; });
@@ -238,7 +247,7 @@
 
     view.innerHTML =
       '<section class="section"><a class="back" href="#/espacios">' + I.back + 'Espacios</a>' +
-      '<p class="mono muted" style="margin:0 0 4px">ESPACIO · CH ' + esc(e.canal) + '</p>' +
+      '<p class="mono muted" style="margin:0 0 4px">ESPACIO · ' + (canalEspacio ? 'CH ' + esc(canalEspacio.numero) : 'SIN CANAL ACTIVO') + '</p>' +
       '<h1 class="h1">' + esc(e.nombre) + '</h1><p class="lead">' + esc(e.descripcion) + '</p></section>' +
       '<section class="section"><div id="monitor"></div></section>' +
       '<section class="section"><div class="tabs" role="tablist">' +
@@ -251,7 +260,7 @@
         '<button type="button" class="btn ghost block" style="margin-top:12px" id="comparte">Comparte con CFCX</button></div></section>';
 
     var mon = new window.CFCXMonitor(document.getElementById('monitor'), {
-      canales: DATA.canales, inicial: e.canal, mostrarCanales: false
+      canales: canalEspacio ? DATA.canales : [], inicial: canalEspacio ? canalEspacio.numero : '', mostrarCanales: false
     });
     monitorActual = mon;
     limpieza.push(function () { if (monitorActual === mon) monitorActual = null; mon.destroy(); });
@@ -305,7 +314,8 @@
       var art = (DATA.articulos || []).filter(function (a) { return norm(a.titulo + ' ' + a.tipo).indexOf(t) > -1; });
       var html = '';
       if (esp.length) html += '<h2 class="eyebrow">Espacios</h2><div class="list" style="margin-bottom:18px">' + esp.map(function (e) {
-        return '<a class="row" href="#/espacio/' + esc(e.id) + '"><span class="meta"><span class="kicker">CH ' + esc(e.canal) + '</span><span class="title" style="display:block">' + esc(e.nombre) + '</span></span><span class="chev">' + I.chev + '</span></a>';
+        var canal = canalPorEspacio(e.id);
+        return '<a class="row" href="#/espacio/' + esc(e.id) + '"><span class="meta"><span class="kicker">' + (canal ? 'CH ' + esc(canal.numero) : 'SIN CANAL ACTIVO') + '</span><span class="title" style="display:block">' + esc(e.nombre) + '</span></span><span class="chev">' + I.chev + '</span></a>';
       }).join('') + '</div>';
       if (pro.length) html += '<h2 class="eyebrow">Programas</h2><div class="list" style="margin-bottom:18px">' + pro.map(filaPrograma).join('') + '</div>';
       if (art.length) html += '<h2 class="eyebrow">Revista</h2><div class="list">' + art.map(filaArticulo).join('') + '</div>';
@@ -503,8 +513,13 @@
     DATA.canales = nuevo.canales;
     origenCanales = nuevo.origen;
     actualizarLeyendaCanales();
-    if (monitorActual && anterior !== JSON.stringify(DATA.canales)) {
-      monitorActual.actualizarCanales(DATA.canales);
+    if (anterior !== JSON.stringify(DATA.canales)) {
+      // En Espacios también se actualiza la relación canal-espacio.
+      if (/^#\/espacios(?:\/|$)|^#\/espacio\//.test(location.hash)) {
+        router();
+      } else if (monitorActual) {
+        monitorActual.actualizarCanales(DATA.canales);
+      }
     }
   }
 

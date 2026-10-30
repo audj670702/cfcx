@@ -1,24 +1,19 @@
-/* ==========================================================
-   App CFCX · configuración general
-   Cambia aquí la señal 24/7 sin tocar el resto del código.
-   ========================================================== */
+/* CFCX · Fuentes de canales · v2.0
+   Panel TV Digital (Wix) administra CH01..; CH00 es opcional y local a la EO.
+*/
 window.CFCX_CONFIG = {
-  // Señal digital 24/7 (HLS) emitida desde el VPS.
-  senal24: {
-    nombre: 'Señal CFCX 24/7',
-    url: 'https://tvdigital.scad.mx/cfcx/canal/index.m3u8'
-  },
-
-  // Archivos de contenido (editables sin tocar código).
+  canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanalesPublicos',
+  // Opcional por EO. No se publica ni administra en Panel TV:
+  // canalEO: { activo: true, codigo: 'CH00', nombre: 'Canal EO',
+  //            tipo: 'VPS', rutaHls: 'https://servidor/eo/index.m3u8' },
+  canalEO: null,
   datos: {
-    canales: './data/canales.json',
+    canales: './data/canales.json', // respaldo temporal, NO fuente de administración
     espacios: './data/espacios.json',
     flyers: './data/flyers.json',
     programas: './data/programas.json',
     articulos: './data/articulos.json',
     cupones: './data/cupones.json'
   },
-
-  // Segundos entre cada flyer en la franja automática.
   flyerIntervalo: 5
 };

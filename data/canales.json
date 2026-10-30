@@ -1,10 +1,65 @@
 {
-  "_nota": "Canal 01 usa la señal 24/7 definida en js/config.js. Los demás son canales virtuales: cada uno reproduce una lista de YouTube (playlist). Las listas actuales son EJEMPLOS tomados del catálogo de TV Digital Internet; cámbialas por las definitivas de cada Espacio.",
+  "_nota": "RESPALDO TEMPORAL de catálogo TV Digital al 2026-10-30. La fuente oficial es el endpoint público Wix; este JSON no administra canales. CH00 corresponde a cada EO, si aplica.",
   "canales": [
-    { "numero": "01", "id": "envivo", "nombre": "En vivo", "tipo": "hls", "espacio": null },
-    { "numero": "02", "id": "musica", "nombre": "Música", "tipo": "youtube", "playlist": "PL2WUtTdjOEIX1w9PO8-Vctf5GX-jsDYbZ", "espacio": "musica" },
-    { "numero": "03", "id": "deporte", "nombre": "Deporte", "tipo": "youtube", "playlist": "PL2WUtTdjOEIVxdwPMjsoKxt7n4d3x_uDe", "espacio": "deporte" },
-    { "numero": "04", "id": "cultura", "nombre": "Cultura", "tipo": "youtube", "playlist": "PL2WUtTdjOEIULtb0WmkTSk_5GDOBTs2OC", "espacio": "cultura" },
-    { "numero": "05", "id": "comunidad", "nombre": "Comunidad", "tipo": "youtube", "playlist": "PL2WUtTdjOEIWkxEmT6cFT4kn4YBx-iuA3", "espacio": "comunidad" }
+    {
+      "codigo": "CH01",
+      "numero": "01",
+      "nombre": "TV Digital Internet",
+      "tipo": "VPS",
+      "rutaHls": "https://tvdigital.scad.mx/cfcx/canal/index.m3u8",
+      "espacio": null,
+      "orden": 1,
+      "activo": true
+    },
+    {
+      "codigo": "CH02",
+      "numero": "02",
+      "nombre": "Programación variada",
+      "tipo": "VPS",
+      "rutaHls": "https://tvdigital.scad.mx/cfcx/prueba/index.m3u8",
+      "espacio": "noticias",
+      "orden": 2,
+      "activo": true
+    },
+    {
+      "codigo": "CH03",
+      "numero": "03",
+      "nombre": "Música",
+      "tipo": "VIRTUAL",
+      "playlistYoutube": "PL2WUtTdjOEIX1w9PO8-Vctf5GX-jsDYbZ",
+      "espacio": "musica",
+      "orden": 3,
+      "activo": true
+    },
+    {
+      "codigo": "CH04",
+      "numero": "04",
+      "nombre": "Deporte",
+      "tipo": "VIRTUAL",
+      "playlistYoutube": "PL2WUtTdjOEIVxdwPMjsoKxt7n4d3x_uDe",
+      "espacio": "deporte",
+      "orden": 4,
+      "activo": true
+    },
+    {
+      "codigo": "CH05",
+      "numero": "05",
+      "nombre": "Cultura",
+      "tipo": "VIRTUAL",
+      "playlistYoutube": "PL2WUtTdjOEIULtb0WmkTSk_5GDOBTs2OC",
+      "espacio": "cultura",
+      "orden": 5,
+      "activo": true
+    },
+    {
+      "codigo": "CH06",
+      "numero": "06",
+      "nombre": "Comunidad",
+      "tipo": "VIRTUAL",
+      "playlistYoutube": "PL2WUtTdjOEIWkxEmT6cFT4kn4YBx-iuA3",
+      "espacio": "comunidad",
+      "orden": 6,
+      "activo": true
+    }
   ]
 }

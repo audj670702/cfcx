@@ -4,6 +4,10 @@ Prototipo navegable de la app de **Canal Foro CX**: monitor tipo TV con la seña
 
 HTML, CSS y JavaScript sin frameworks ni compilación. Se publica con GitHub Pages y se puede instalar en el celular (PWA).
 
+## Versión visible de la aplicación
+
+La barra superior muestra de forma permanente la versión debajo del nombre **CANAL FORO CX** (versión inicial visible: `v0.1.0`). La versión se define únicamente en `js/config.js`, propiedad `version`; `js/app.js` la presenta mediante `#appVersion`. Incrementar `version` al publicar cambios. Se actualizó la caché de la PWA a `cfcx-v4` para servir el nuevo diseño.
+
 ## Qué cambiar sin tocar código
 
 | Qué | Dónde |

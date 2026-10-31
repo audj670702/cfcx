@@ -334,7 +334,7 @@
   V.articulo = function (id) {
     var x = (DATA.articulos || []).filter(function (a) { return a.id === id; })[0];
     if (!x) { location.hash = '#/revista'; return; }
-    var audio = urlExterna(x.audioUrl), video = urlExterna(x.programaUrl);
+    var audio = urlExterna(x.audioUrl), video = urlExterna(x.programaUrl), original = urlExterna(x.publicacionUrl);
     var fotos = Array.isArray(x.fotografias) ? x.fotografias : [];
     var bloques = Array.isArray(x.bloques) && x.bloques.length ? x.bloques :
       String(x.texto || x.resumen || '').split(/\n\s*\n/).filter(Boolean).map(function (t) { return { tipo: 'parrafo', texto: t }; });
@@ -360,6 +360,8 @@
       (video ? '<div class="revista-fuente"><small>PROGRAMA DE ORIGEN</small><strong>' +
         esc(x.programa || 'Canal Foro CX') + '</strong><a class="link-arrow" href="' + esc(video) +
         '" target="_blank" rel="noopener noreferrer">Consultar programa original ' + I.chev + '</a></div>' : '') +
+      (original ? '<div class="revista-fuente"><small>PUBLICACIÓN EN WIX BLOG</small><a class="link-arrow" href="' +
+        esc(original) + '" target="_blank" rel="noopener noreferrer">Ver entrada original ' + I.chev + '</a></div>' : '') +
       '</article>';
   };
 

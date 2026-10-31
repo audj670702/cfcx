@@ -416,7 +416,7 @@ body.cfcx-tv-fs .tv-fs-close { z-index: 10000; }
 /* ---------- Barra inferior ---------- */
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
   background: var(--bg); border-top: 1px solid var(--line);
 }
@@ -446,3 +446,94 @@ body.cfcx-tv-fs .tv-fs-close { z-index: 10000; }
   .tv-static.on { animation: none; }
   .flyer-track { scroll-behavior: auto; }
 }
+
+/* REVISTA: portada impresa + interfaz digital */
+.revista-home { margin-top: 14px; }
+.revista-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:14px; }
+.revista-head .h1,.revista-head .eyebrow { margin:0; }
+.revista-home-feature { display:grid; grid-template-columns:minmax(120px,210px) 1fr; align-items:center; gap:22px; max-width:850px; }
+.revista-home-feature h3 { font:700 clamp(23px,3vw,36px)/1.12 Georgia,serif; margin:8px 0; }
+.revista-home-feature p.muted { font-size:14px; }
+.revista-vacia { padding:clamp(22px,4vw,40px); border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); }
+.revista-vacia strong { font:700 clamp(22px,3vw,30px) Georgia,serif; }
+.revista-vacia p { color:var(--muted); }
+.portada-revista { overflow:hidden; display:flex; flex-direction:column; aspect-ratio:3/4; background:#efe8d9; border:1px solid #9b8d7a; box-shadow:0 10px 25px #0002; color:#171717; width:100%; }
+.portada-masthead { font:900 clamp(12px,4vw,30px)/1 Georgia,serif; background:#faf6eb; border-bottom:2px solid #171717; padding:7% 7% 5%; letter-spacing:-.05em; }
+.portada-masthead small { display:block; font:600 8px/1.4 monospace; letter-spacing:.15em; margin-top:4px; }
+.portada-foto { flex:1; min-height:0; background:linear-gradient(140deg,#d6c5a8,#eee3cf,#a99b88); display:grid; place-items:center; overflow:hidden; }
+.portada-foto img { width:100%; height:100%; object-fit:cover; }
+.portada-foto span { opacity:.16; font:900 64px Georgia,serif; }
+.portada-titular { background:#faf6eb; border-top:3px solid #171717; display:grid; gap:3px; padding:6% 7% 7%; }
+.portada-titular small { font:600 9px monospace; letter-spacing:.12em; text-transform:uppercase; }
+.portada-titular strong { font:900 clamp(14px,2.7vw,27px)/1.04 Georgia,serif; text-transform:uppercase; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+.portada-mini .portada-masthead { font-size:9px; padding:6%; }
+.portada-mini .portada-masthead small { font-size:4px; margin-top:2px; }
+.portada-mini .portada-titular { padding:5%; }
+.portada-mini .portada-titular strong { font-size:7px; -webkit-line-clamp:2; }
+.portada-mini .portada-titular small { font-size:4px; }
+.portada-mini .portada-foto span { font-size:20px; }
+.revista-carrusel { display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center; gap:8px; padding:18px 8px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface-2); }
+.revista-carrusel > button { background:var(--surface); border:1px solid var(--line); border-radius:10px; color:var(--text); height:44px; display:grid; place-items:center; }
+.revista-carrusel > button svg { width:18px; height:18px; }
+#revistaDestacada { min-width:0; display:grid; justify-items:center; gap:12px; }
+#revistaDestacada > a { width:min(100%,300px); display:block; }
+.revista-destacada-titulo { font:700 21px Georgia,serif; text-align:center; margin:0; }
+.revista-tira { display:flex; overflow-x:auto; gap:12px; padding:12px 3px 18px; scroll-snap-type:x proximity; }
+.revista-miniatura { flex:0 0 95px; padding:0; border:0; background:transparent; opacity:.8; cursor:pointer; scroll-snap-align:start; }
+.revista-miniatura.activa,.revista-miniatura:focus-visible { opacity:1; outline:3px solid var(--accent); outline-offset:3px; }
+.revista-lectura { max-width:720px; margin-inline:auto; }
+.portada-articulo { max-width:min(100%,425px); margin:16px auto 26px; }
+.revista-lectura > h1 { font-family:Georgia,serif; font-size:clamp(28px,4vw,42px); }
+.revista-cuerpo { font-size:clamp(16px,2vw,19px); line-height:1.75; margin:24px auto; }
+.revista-cuerpo h2 { font-family:Georgia,serif; line-height:1.2; }
+.revista-cuerpo blockquote { font:italic 1.3em/1.4 Georgia,serif; border-left:3px solid var(--accent); padding-left:18px; margin:24px 0; }
+.revista-cuerpo img { max-width:100%; }
+.revista-cuerpo figcaption { color:var(--muted); font-size:12px; }
+.revista-audio,.revista-fuente { display:grid; gap:10px; padding:16px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin:22px 0; }
+.revista-audio audio { width:100%; }
+.revista-fotos { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.revista-fotos img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; }
+@media(max-width:540px) {
+  .revista-home-feature { grid-template-columns:120px minmax(0,1fr); gap:14px; }
+  .revista-home-feature h3 { font-size:21px; }
+  .revista-home-feature p.muted { display:none; }
+  .revista-head .link-arrow { font-size:12px; }
+  .revista-carrusel { grid-template-columns:30px minmax(0,1fr) 30px; gap:5px; }
+  .revista-carrusel > button { height:38px; }
+  .tabbar a { font-size:10px; }
+}
+
+/* REVISTA v0.2.0 · dirección editorial de la tarjeta de continuidad */
+.revista-nombre { font-family:Georgia,serif; }
+.portada-revista { background:#f4ecdc; color:#332722; border-color:#c7b9a0; }
+.portada-masthead { color:#6e2434; border-bottom:1px solid #6e2434; background:#f7f0e3; font-size:clamp(20px,5vw,42px); padding:5% 7% 3%; }
+.portada-masthead small { color:#493a33; font-size:7px; }
+.portada-edicion { padding:3% 7%; font:8px/1.2 Georgia,serif; letter-spacing:.04em; color:#6e2434; }
+.portada-foto { flex:1 1 32%; min-height:15%; background:#ddd1bd; }
+.portada-titular { border-top:2px solid #6e2434; padding:5% 7% 3%; background:#f7f0e3; }
+.portada-titular small { color:#6e2434; font-size:8px; }
+.portada-titular strong { font-size:clamp(16px,3.2vw,28px); text-transform:none; line-height:1.08; -webkit-line-clamp:4; }
+.portada-titular p { font:11px/1.35 Georgia,serif; margin:4px 0 0; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.portada-firma { background:#f7f0e3; padding:3% 7% 4%; font:7px Georgia,serif; color:#6e2434; }
+.portada-mini .portada-edicion { font-size:3px; }.portada-mini .portada-firma { font-size:3px; }.portada-mini .portada-titular p { display:none; }
+.portada-home .portada-titular strong { font-size:clamp(13px,2.5vw,21px); }.portada-home .portada-titular p { font-size:9px; }
+.revista-carrusel { border:0; background:transparent; padding:10px 0; }
+.revista-carrusel > button { border-radius:50%; }
+#revistaDestacada > a { width:min(100%,330px); }
+.revista-puntos { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:22px 0 10px; }
+.revista-puntos button { width:12px; height:12px; padding:0; border:1px solid var(--muted); border-radius:50%; background:transparent; cursor:pointer; }
+.revista-puntos button[aria-pressed="true"] { background:var(--text); border-color:var(--text); }
+.revista-pausa { font:12px var(--font-body); color:var(--text); border:1px solid var(--line); border-radius:8px; background:var(--surface); min-height:40px; padding:8px 12px; cursor:pointer; }
+.revista-pausa:disabled { opacity:.5; cursor:default; }
+.revista-tira { position:relative; scroll-behavior:smooth; }
+.revista-miniatura.activa { outline-color:#9e5867; }
+.revista-byline { font-size:13px; color:var(--muted); border-block:1px solid var(--line); padding:14px 0; }
+.revista-principal { margin:24px 0; }.revista-principal img { display:block; width:100%; max-height:540px; object-fit:cover; }
+.revista-lectura .revista-cuerpo { font-family:Georgia,serif; line-height:1.85; }
+.revista-lectura blockquote { border-color:#9e5867; }
+.revista-cuerpo figure { margin:26px 0; }
+@media(max-width:540px){.portada-home .portada-titular strong{font-size:12px}.portada-home .portada-titular p{display:none}.portada-home .portada-edicion,.portada-home .portada-firma{font-size:5px}.revista-home-feature{align-items:center}.revista-head{align-items:center}}
+@media(prefers-reduced-motion:reduce){.revista-tira{scroll-behavior:auto}}
+
+/* Inicio: últimas cinco publicaciones y salida clásica a la revista */
+.revista-home-slide[hidden]{display:none!important}.revista-home-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}.revista-home-controls .revista-puntos{margin:0}.revista-home-controls>button[data-home-step]{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);cursor:pointer}.revista-home-controls svg{width:18px;height:18px}.revista-explorar{display:flex;justify-content:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}.revista-explorar svg{width:18px;height:18px}.revista-home-feature{min-height:280px}@media(max-width:540px){.revista-home-feature{min-height:210px}.revista-home-controls{gap:12px}}

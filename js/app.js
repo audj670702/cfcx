@@ -177,6 +177,10 @@
   }
   function portadaRevista(a, variante) {
     var foto = urlExterna(a.portada);
+    var arteFinal = urlExterna(a.portadaDisenada);
+    if (arteFinal) return '<div class="portada-revista portada-' + (variante || 'normal') +
+      ' portada-imagen-final"><img loading="lazy" src="' + esc(arteFinal) +
+      '" alt="Portada REVISTA CFCX: ' + esc(a.titulo || '') + '"></div>';
     return '<div class="portada-revista portada-' + (variante || 'normal') + '">' +
       '<div class="portada-masthead">REVISTA <small>CANAL FORO CX</small></div>' +
       '<div class="portada-edicion">' + esc(a.edicion || 'EDICIÓN DIGITAL') + (fechaEditorial(a) ? ' · ' + esc(fechaEditorial(a)) : '') + '</div>' +
@@ -334,7 +338,7 @@
   V.articulo = function (id) {
     var x = (DATA.articulos || []).filter(function (a) { return a.id === id; })[0];
     if (!x) { location.hash = '#/revista'; return; }
-    var audio = urlExterna(x.audioUrl), video = urlExterna(x.programaUrl);
+    var audio = urlExterna(x.audioUrl), video = urlExterna(x.programaUrl), original = urlExterna(x.publicacionUrl);
     var fotos = Array.isArray(x.fotografias) ? x.fotografias : [];
     var bloques = Array.isArray(x.bloques) && x.bloques.length ? x.bloques :
       String(x.texto || x.resumen || '').split(/\n\s*\n/).filter(Boolean).map(function (t) { return { tipo: 'parrafo', texto: t }; });
@@ -360,6 +364,8 @@
       (video ? '<div class="revista-fuente"><small>PROGRAMA DE ORIGEN</small><strong>' +
         esc(x.programa || 'Canal Foro CX') + '</strong><a class="link-arrow" href="' + esc(video) +
         '" target="_blank" rel="noopener noreferrer">Consultar programa original ' + I.chev + '</a></div>' : '') +
+      (original ? '<div class="revista-fuente"><small>PUBLICACIÓN EN WIX BLOG</small><a class="link-arrow" href="' +
+        esc(original) + '" target="_blank" rel="noopener noreferrer">Ver entrada original ' + I.chev + '</a></div>' : '') +
       '</article>';
   };
 
@@ -617,8 +623,12 @@
 
   // El catálogo es público y filtrado en el backend de Wix; nunca exponer tokens.
   function cargarRevista() {
-    if (!CFG.revistaApiUrl) return Promise.resolve({ articulos: [] });
-    return cargar(CFG.revistaApiUrl).then(function (x) {
+    // Wix Blog es la fuente editorial. Mientras se publica su endpoint, leer
+    // la primera entrada capturada de una publicación real; nunca el catálogo
+    // de ejemplos ni borradores. El servicio live tendrá prioridad al activarse.
+    var fuente = CFG.revistaApiUrl || CFG.revistaInicialUrl;
+    if (!fuente) return Promise.resolve({ articulos: [] });
+    return cargar(fuente).then(function (x) {
       if (!x || !Array.isArray(x.articulos)) throw new Error('REVISTA_FORMATO');
       return x;
     }).catch(function () { return { articulos: [], error: true }; });

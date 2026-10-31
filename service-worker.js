@@ -1,16 +1,17 @@
 /* App CFCX · service worker
    Guarda la "cáscara" de la app para abrir rápido e instalarla.
    Nunca guarda la señal en vivo (HLS) ni YouTube. */
-const CACHE = 'cfcx-v7';
+const CACHE = 'cfcx-v8';
 const SHELL = [
   './',
   './index.html',
-  './css/app.css?v=0.2.0',
-  './js/config.js?v=0.2.0',
+  './css/app.css?v=0.2.1',
+  './js/config.js?v=0.2.1',
+  './js/install.js?v=0.2.1',
   './js/store.js',
   './js/canales.js',
   './js/monitor.js',
-  './js/app.js?v=0.2.0',
+  './js/app.js?v=0.2.1',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/icon-192.png',
@@ -32,6 +33,9 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return; // externos: directo a red
+
+  // Los tutoriales se reproducen bajo demanda; no guardar video ni respuestas parciales.
+  if (e.request.destination === 'video' || /\.mp4$/i.test(url.pathname) || e.request.headers.has('range')) return;
 
   // Red primero (contenido siempre al día); caché solo si no hay conexión.
   e.respondWith(

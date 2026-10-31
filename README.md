@@ -72,3 +72,8 @@ Sin servicio editorial configurado se muestra un estado vacío: no se sustituyen
 ### Ajuste de Inicio: carrusel de cinco ediciones
 
 El bloque editorial bajo el monitor muestra una publicación a la vez entre las cinco más recientes, conservando portada vertical, titular, resumen y lectura directa. Incluye flechas, cinco indicadores como máximo y pausa/reanudación. La interacción pausa el avance automático; se respeta movimiento reducido. El botón fijo «Explorar más» abre `#/revista`. No se altera el monitor ni el catálogo de canales.
+
+
+## Instalación · v0.2.1
+
+El botón «Instalar app» en la barra superior abre el diálogo nativo cuando el navegador entrega `beforeinstallprompt`. En iPhone/iPad abre el tutorial `assets/tutorial-instalar-app.mp4` con controles y pasos de Safari para agregar a pantalla de inicio. Si no hay diálogo nativo disponible, muestra instrucciones de instalación y acceso al tutorial de iPhone. El acceso se oculta en modo standalone y después de `appinstalled`; el cierre pausa el video. El MP4 se carga bajo demanda y queda fuera de la caché del service worker para evitar almacenar el tutorial de 13 MB o respuestas HTTP Range.

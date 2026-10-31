@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=JetBrains+Mono:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/app.css?v=0.2.0">
+  <link rel="stylesheet" href="./css/app.css?v=0.2.1">
   <script>
     // Aplica el tema guardado antes de pintar, para evitar parpadeo.
     try {
@@ -30,9 +30,10 @@
   <header class="topbar">
     <div class="topbar-brand">
       <a href="#/inicio" class="wordmark" aria-label="Canal Foro CX, inicio">CANAL FORO <span>CX</span></a>
-      <span class="app-version" id="appVersion" aria-label="Versión de la aplicación">v0.1.0</span>
+      <span class="app-version" id="appVersion" aria-label="Versión de la aplicación">v0.2.1</span>
     </div>
     <div class="topbar-actions">
+      <button type="button" class="pill install-app" id="installApp" aria-haspopup="dialog" aria-controls="installDialog" hidden>Instalar app</button>
       <button type="button" class="icon-btn" id="themeToggle" aria-label="Cambiar tema"></button>
       <a href="#/mi" class="pill" id="sessionLink">Entrar</a>
     </div>
@@ -60,11 +61,19 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <dialog class="install-dialog" id="installDialog" aria-labelledby="installTitle">
+    <div class="install-dialog-head"><h2 id="installTitle">Instalar CFCX</h2><button type="button" class="icon-btn" id="closeInstall" aria-label="Cerrar instalación" autofocus>✕</button></div>
+    <div id="installInstructions"></div>
+    <video id="installTutorial" controls playsinline preload="none" hidden aria-label="Tutorial para instalar CFCX en iPhone"></video>
+    <p id="installVideoError" role="status" hidden>No se pudo reproducir el tutorial. Sigue los pasos indicados arriba o <a href="./assets/tutorial-instalar-app.mp4" target="_blank" rel="noopener">abre el video directamente</a>.</p>
+    <button type="button" class="btn" id="showInstallTutorial">Ver tutorial para iPhone</button>
+  </dialog>
+  <script src="./js/install.js?v=0.2.1" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" defer></script>
-  <script src="./js/config.js?v=0.2.0" defer></script>
+  <script src="./js/config.js?v=0.2.1" defer></script>
   <script src="./js/store.js" defer></script>
   <script src="./js/canales.js" defer></script>
   <script src="./js/monitor.js" defer></script>
-  <script src="./js/app.js?v=0.2.0" defer></script>
+  <script src="./js/app.js?v=0.2.1" defer></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 */
 window.CFCX_CONFIG = {
   // Versión visible en la barra superior. Incrementar en cada publicación.
-  version: 'v0.2.2',
+  version: 'v0.2.3',
   canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanales',
   // Señales VPS de contingencia tomadas de la configuración confirmada en Panel TV.
   // Solo se usan cuando tvdCanales no proporciona una URL HLS válida.
@@ -26,7 +26,7 @@ window.CFCX_CONFIG = {
   },
   // Servicio público de solo lectura Wix Blog; activar tras validarlo.
   revistaApiUrl: null,
-  // Primera entrada real de Wix Blog, mientras se publica el endpoint dinámico.
+  // Portadas y enlaces a Wix Blog; hasta activar el endpoint público se usa la primera entrada.
   revistaInicialUrl: './data/revista-inicial.json',
   flyerIntervalo: 5
 };

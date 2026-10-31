@@ -12,8 +12,76 @@
       "portadaDisenada": "https://static.wixstatic.com/media/0492f8_d03043f791534ba096d1ba3af4c8a415~mv2.png",
       "publicacionUrl": "https://www.scad.mx/post/luxure-cine-en-corto-guion-rodaje-celaya",
       "firma": "Redacción Canal Foro CX",
-      "etiquetas": []
+      "etiquetas": [],
+      "programaUrl": "https://www.youtube.com/watch?v=HR1pSzHeUkE",
+      "interacciones": [
+        {
+          "id": "articulo",
+          "etiqueta": "Detrás de «Luxure»",
+          "titulo": "Crear cine entre amigos y resolver sobre la marcha",
+          "descripcion": "El equipo del cortometraje comparte los retos de llevar su historia a la pantalla.",
+          "destino": "articulo",
+          "area": {
+            "x": 5,
+            "y": 49,
+            "ancho": 64,
+            "alto": 30
+          }
+        },
+        {
+          "id": "guion",
+          "etiqueta": "Un guion que se transforma",
+          "titulo": "Un guion que se transforma al filmar",
+          "descripcion": "Escribir entre varias personas implica negociar ideas, adaptar escenas y encontrar soluciones realizables.",
+          "destino": "articulo",
+          "area": {
+            "x": 71,
+            "y": 50,
+            "ancho": 27,
+            "alto": 15
+          }
+        },
+        {
+          "id": "celaya",
+          "etiqueta": "Filmar en Celaya",
+          "titulo": "Filmar en Celaya: resolver con lo que se tiene",
+          "descripcion": "Locaciones disponibles, espacios reducidos y decisiones de producción que exigieron creatividad y colaboración.",
+          "destino": "articulo",
+          "area": {
+            "x": 71,
+            "y": 66,
+            "ancho": 27,
+            "alto": 13
+          }
+        },
+        {
+          "id": "aprendizaje",
+          "etiqueta": "Aprendizaje colectivo",
+          "titulo": "Un aprendizaje colectivo",
+          "descripcion": "El equipo destaca la comunicación, la confianza y la perseverancia necesarias para seguir haciendo cine.",
+          "destino": "articulo",
+          "area": {
+            "x": 71,
+            "y": 80,
+            "ancho": 27,
+            "alto": 14
+          }
+        },
+        {
+          "id": "programa",
+          "etiqueta": "Ver Cine en Corto",
+          "titulo": "Entrevista original · Cine en Corto",
+          "descripcion": "Conoce la conversación completa con el equipo de «Luxure» en Canal Foro CX.",
+          "destino": "video",
+          "area": {
+            "x": 21,
+            "y": 95,
+            "ancho": 57,
+            "alto": 5
+          }
+        }
+      ]
     }
   ],
-  "_origen": "Revista CFCX · enlace a entrada publicada en Wix Blog; sin duplicación del cuerpo"
+  "_origen": "Revista CFCX · Prototipo de zonas interactivas sobre portada existente; lectura oficial en Wix Blog."
 }

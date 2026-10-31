@@ -7,6 +7,8 @@
   var CFG = window.CFCX_CONFIG;
   var versionEl = document.getElementById('appVersion');
   if (versionEl) versionEl.textContent = CFG.version || 'v0.1.0';
+  var footerVersionEl = document.getElementById('footerVersion');
+  if (footerVersionEl) footerVersionEl.textContent = CFG.version || 'v0.1.0';
   var STORE = window.CFCX_STORE;
   var view = document.getElementById('view');
   var DATA = {};

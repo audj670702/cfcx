@@ -3,7 +3,7 @@
 */
 window.CFCX_CONFIG = {
   // Versión visible en la barra superior. Incrementar en cada publicación.
-  version: 'v0.2.4',
+  version: 'v0.2.5',
   canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanales',
   // Señales VPS de contingencia tomadas de la configuración confirmada en Panel TV.
   // Solo se usan cuando tvdCanales no proporciona una URL HLS válida.

@@ -59,3 +59,16 @@ El monitor de Inicio y el servicio de canales permanecen intactos. Se pausan los
 REVISTA dispone de portadas retro compuestas en la app, carrusel automático de las cinco publicaciones recientes, hemeroteca desplazable, filtro de búsqueda y lectura editorial con fotografías, audio opcional y enlace complementario al programa de origen.
 
 Fuente exclusiva prevista: Wix Blog de SCaD; se han retirado los artículos de demostración del flujo de carga. La propiedad \`revistaApiUrl\` de \`js/config.js\` permanece en null hasta que esté disponible un endpoint Wix público, autorizado y filtrado para CFCX. El endpoint debe devolver \`{ "articulos": [...] }\` con \`id, titulo, tipo, resumen, portada, texto/bloques, audioUrl, fotografias, programa, programaUrl, espacio\`. El navegador no debe usar claves Wix. Sin publicaciones se muestra un estado vacío real.
+
+
+## REVISTA v0.2.0 · revisión de diseño conforme a continuidad
+
+Se mantiene la rama de desarrollo y la integración editorial pendiente. Las portadas se componen en CFCX en proporción 3:4 con papel cálido, acentos vino, cabecera, fotografía, titular, entrada, edición, fecha y firma Redacción Canal Foro CX. El carrusel rota entre las cinco entradas recientes; flechas, indicadores y miniportadas permiten selección manual, pausan el movimiento y mantienen sincronizada la selección. Las miniportadas y la hemeroteca permiten consultar las entradas anteriores. Se respeta la preferencia de movimiento reducido.
+
+La hemeroteca busca título, tema, invitado, programa y etiquetas, con orden cronológico. El lector conserva título, entrada, firma, fecha, fotografía, párrafos, subtítulos, citas, imágenes, galería, audio opcional y fuente original. Inicio conserva monitor primero y revista después; la navegación mantiene Inicio, Revista, Videoteca, Arcade y Mi CFCX.
+
+Sin servicio editorial configurado se muestra un estado vacío: no se sustituyen publicaciones de Wix por artículos locales. Las muestras para verificación visual se sirven exclusivamente en la vista local externa al repositorio y no forman parte del contenido publicado. No se han modificado monitor, fuentes de canales ni servicios VPS. Pendiente: Wix Blog → Velo → CFCX y validación con una entrada publicada real.
+
+### Ajuste de Inicio: carrusel de cinco ediciones
+
+El bloque editorial bajo el monitor muestra una publicación a la vez entre las cinco más recientes, conservando portada vertical, titular, resumen y lectura directa. Incluye flechas, cinco indicadores como máximo y pausa/reanudación. La interacción pausa el avance automático; se respeta movimiento reducido. El botón fijo «Explorar más» abre `#/revista`. No se altera el monitor ni el catálogo de canales.

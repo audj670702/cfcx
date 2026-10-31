@@ -502,3 +502,38 @@ body.cfcx-tv-fs .tv-fs-close { z-index: 10000; }
   .revista-carrusel > button { height:38px; }
   .tabbar a { font-size:10px; }
 }
+
+/* REVISTA v0.2.0 · dirección editorial de la tarjeta de continuidad */
+.revista-nombre { font-family:Georgia,serif; }
+.portada-revista { background:#f4ecdc; color:#332722; border-color:#c7b9a0; }
+.portada-masthead { color:#6e2434; border-bottom:1px solid #6e2434; background:#f7f0e3; font-size:clamp(20px,5vw,42px); padding:5% 7% 3%; }
+.portada-masthead small { color:#493a33; font-size:7px; }
+.portada-edicion { padding:3% 7%; font:8px/1.2 Georgia,serif; letter-spacing:.04em; color:#6e2434; }
+.portada-foto { flex:1 1 32%; min-height:15%; background:#ddd1bd; }
+.portada-titular { border-top:2px solid #6e2434; padding:5% 7% 3%; background:#f7f0e3; }
+.portada-titular small { color:#6e2434; font-size:8px; }
+.portada-titular strong { font-size:clamp(16px,3.2vw,28px); text-transform:none; line-height:1.08; -webkit-line-clamp:4; }
+.portada-titular p { font:11px/1.35 Georgia,serif; margin:4px 0 0; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.portada-firma { background:#f7f0e3; padding:3% 7% 4%; font:7px Georgia,serif; color:#6e2434; }
+.portada-mini .portada-edicion { font-size:3px; }.portada-mini .portada-firma { font-size:3px; }.portada-mini .portada-titular p { display:none; }
+.portada-home .portada-titular strong { font-size:clamp(13px,2.5vw,21px); }.portada-home .portada-titular p { font-size:9px; }
+.revista-carrusel { border:0; background:transparent; padding:10px 0; }
+.revista-carrusel > button { border-radius:50%; }
+#revistaDestacada > a { width:min(100%,330px); }
+.revista-puntos { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:22px 0 10px; }
+.revista-puntos button { width:12px; height:12px; padding:0; border:1px solid var(--muted); border-radius:50%; background:transparent; cursor:pointer; }
+.revista-puntos button[aria-pressed="true"] { background:var(--text); border-color:var(--text); }
+.revista-pausa { font:12px var(--font-body); color:var(--text); border:1px solid var(--line); border-radius:8px; background:var(--surface); min-height:40px; padding:8px 12px; cursor:pointer; }
+.revista-pausa:disabled { opacity:.5; cursor:default; }
+.revista-tira { position:relative; scroll-behavior:smooth; }
+.revista-miniatura.activa { outline-color:#9e5867; }
+.revista-byline { font-size:13px; color:var(--muted); border-block:1px solid var(--line); padding:14px 0; }
+.revista-principal { margin:24px 0; }.revista-principal img { display:block; width:100%; max-height:540px; object-fit:cover; }
+.revista-lectura .revista-cuerpo { font-family:Georgia,serif; line-height:1.85; }
+.revista-lectura blockquote { border-color:#9e5867; }
+.revista-cuerpo figure { margin:26px 0; }
+@media(max-width:540px){.portada-home .portada-titular strong{font-size:12px}.portada-home .portada-titular p{display:none}.portada-home .portada-edicion,.portada-home .portada-firma{font-size:5px}.revista-home-feature{align-items:center}.revista-head{align-items:center}}
+@media(prefers-reduced-motion:reduce){.revista-tira{scroll-behavior:auto}}
+
+/* Inicio: últimas cinco publicaciones y salida clásica a la revista */
+.revista-home-slide[hidden]{display:none!important}.revista-home-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}.revista-home-controls .revista-puntos{margin:0}.revista-home-controls>button[data-home-step]{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--text);cursor:pointer}.revista-home-controls svg{width:18px;height:18px}.revista-explorar{display:flex;justify-content:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}.revista-explorar svg{width:18px;height:18px}.revista-home-feature{min-height:280px}@media(max-width:540px){.revista-home-feature{min-height:210px}.revista-home-controls{gap:12px}}

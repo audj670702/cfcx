@@ -1,8 +1,0 @@
-{
-  "_nota": "Cupones de aliados. En el prototipo el código personalizado se genera en el dispositivo (simulado).",
-  "cupones": [
-    { "id": "c1", "aliado": "[Negocio aliado 1]", "descuento": "[X]%", "detalle": "[Condiciones del descuento]", "hasta": "2027-12-31" },
-    { "id": "c2", "aliado": "[Negocio aliado 2]", "descuento": "[X]%", "detalle": "[Condiciones del descuento]", "hasta": "2027-12-31" },
-    { "id": "c3", "aliado": "[Negocio aliado 3]", "descuento": "2x1", "detalle": "[Condiciones del descuento]", "hasta": "2027-12-31" }
-  ]
-}

@@ -314,29 +314,11 @@
   };
 
   Monitor.prototype.montarYoutube = function (c) {
-    var interna = c.origenPlaylist === 'INTERNA';
-    var ids = interna && Array.isArray(c.videos) ? c.videos.filter(function (id) {
-      return /^[a-zA-Z0-9_-]{11}$/.test(String(id));
-    }) : [];
-    if (interna && !ids.length) {
-      this.mensaje('Canal ' + c.nombre, 'La playlist interna no tiene videos disponibles');
-      return;
-    }
-    if (!interna && !c.playlist) {
-      this.mensaje('Canal ' + c.nombre, 'Lista de reproducción por definir');
-      return;
-    }
-    // YouTube acepta una secuencia de IDs en playlist, sin crear una playlist externa.
-    // El primer ID es el video inicial; loop=1 repite la secuencia completa.
-    var src = interna
-      ? 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(ids[0]) +
-        '?playlist=' + encodeURIComponent(ids.join(',')) +
-        '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
-        '&playsinline=1&rel=0&enablejsapi=1&loop=1'
-      : 'https://www.youtube-nocookie.com/embed/videoseries' +
-        '?list=' + encodeURIComponent(c.playlist) +
-        '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
-        '&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&loop=1';
+    if (!c.playlist) { this.mensaje('Canal ' + c.nombre, 'Lista de reproducción por definir'); return; }
+    var src = 'https://www.youtube-nocookie.com/embed/videoseries' +
+      '?list=' + encodeURIComponent(c.playlist) +
+      '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
+      '&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&loop=1';
     this.estado('loading', 'Cargando contenido…');
     var f = document.createElement('iframe');
     f.src = src;

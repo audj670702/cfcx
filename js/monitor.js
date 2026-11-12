@@ -4,6 +4,8 @@
      barra compacta y selector desplegable de canales.
    - CH01 y CH02: señales HLS independientes.
    - CH03+: listas de YouTube; CH00 opcional y propio de la EO.
+   - CH03+ con playlist del Panel TV (c.programa): un video a la vez con
+     reloj compartido; todos los monitores ven el mismo video al mismo tiempo.
    Inicia silenciado (requisito de los navegadores para
    reproducir automáticamente); el usuario activa el sonido.
    ========================================================== */
@@ -206,6 +208,7 @@
   };
 
   Monitor.prototype.limpiarMedia = function () {
+    clearTimeout(this._programaT); this._programaT = null;
     if (this.hls) { try { this.hls.destroy(); } catch (e) {} this.hls = null; }
     if (this.media && this.media.tagName === 'VIDEO') {
       try { this.media.pause(); this.media.removeAttribute('src'); this.media.load(); } catch (e) {}
@@ -240,6 +243,7 @@
     this.pintarMenu();
 
     if (c.tipo === 'hls') this.montarHls(c);
+    else if (c.tipo === 'youtube' && c.programa) this.montarPrograma(c);
     else if (c.tipo === 'youtube') this.montarYoutube(c);
     else this.mensaje('Canal en preparación', 'Muy pronto en CFCX');
 
@@ -332,6 +336,61 @@
     this.media = f;
   };
 
+  // Playlist del Panel TV: posición = (hora del servidor - origen del ciclo) mod duración total.
+  Monitor.prototype.montarPrograma = function (c) {
+    var self = this;
+    var p = c.programa;
+    var total = p.videos.reduce(function (t, v) { return t + v.duracion; }, 0);
+    var pos = Math.floor((Date.now() + p.desfase - p.origen) / 1000) % total;
+    if (pos < 0) pos += total;
+    var i = 0;
+    while (pos >= p.videos[i].duracion) { pos -= p.videos[i].duracion; i += 1; }
+    var v = p.videos[i];
+    var restante = (v.duracion - pos) * 1000 + 500;
+    var siguiente = function () {
+      if (self.canales[self.idx] !== c) return;
+      self.limpiarMedia();
+      self.montarPrograma(c);
+    };
+    this.estado('loading', 'Cargando contenido…');
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(v.id) +
+      '?start=' + pos + '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
+      '&playsinline=1&rel=0&modestbranding=1&controls=0&enablejsapi=1';
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    f.title = 'Canal ' + c.nombre;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.setAttribute('allowfullscreen', '');
+    f.addEventListener('load', function () {
+      if (self.media !== f) return;
+      self.estado('', '');
+      // Pide a YouTube que informe errores (video eliminado, privado o no insertable).
+      try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'cfcx' }), '*'); } catch (e) {}
+    });
+    this.el.media.appendChild(f);
+    this.media = f;
+    this.el.now.textContent = c.nombre + (v.titulo ? ' · ' + v.titulo : '');
+    // Video no disponible: se espera su horario sin romper el reloj compartido.
+    if (!this._onYtMensaje) {
+      this._onYtMensaje = function (event) {
+        if (!/youtube(-nocookie)?\.com$/.test(String(event.origin || '').replace(/^https:\/\/(www\.)?/, ''))) return;
+        var m = self.media;
+        if (!m || m.tagName !== 'IFRAME' || event.source !== m.contentWindow) return;
+        var d = null;
+        try { d = typeof event.data === 'string' ? JSON.parse(event.data) : event.data; } catch (e) { return; }
+        if (d && d.event === 'onError') {
+          self.limpiarMedia();
+          self.mensaje('Programa no disponible', 'El siguiente programa inicia en breve');
+          var canal = self.canales[self.idx];
+          self._programaT = setTimeout(function () { if (self.canales[self.idx] === canal) { self.limpiarMedia(); self.estado('', ''); self.montarPrograma(canal); } }, self._restante || 5000);
+        }
+      };
+      window.addEventListener('message', this._onYtMensaje);
+    }
+    this._restante = restante;
+    this._programaT = setTimeout(siguiente, restante);
+  };
+
   Monitor.prototype.alternarSonido = function () {
     this.muted = !this.muted;
     var m = this.media;
@@ -386,6 +445,7 @@
   };
 
   Monitor.prototype.destroy = function () {
+    if (this._onYtMensaje) { window.removeEventListener('message', this._onYtMensaje); this._onYtMensaje = null; }
     this.cerrarPantallaCompleta();
     this.limpiarMedia();
     this.root.removeEventListener('click', this.onClick);

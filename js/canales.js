@@ -33,11 +33,20 @@
       var origenPlaylist = String(item.origenPlaylist || 'YOUTUBE').trim().toUpperCase();
       var videos = Array.isArray(item.videos) ? item.videos.map(function (v) {
         var ref = typeof v === 'string' ? v : (v.youtubeId || v.videoId || v.referenciaVideo || '');
-        var matchId = /^[a-zA-Z0-9_-]{11}$/.test(ref) ? ref : null;
+        var matchId = /^[a-zA-Z0-9_-]{11}$/.test(String(ref)) ? String(ref) : '';
         if (!matchId) {
-          var matchUrl = /(?:youtu\\.be\\/|youtube(?:-nocookie)?\\.com\\/(?:watch\\?v=|embed\\/|shorts\\/|live\\/))([a-zA-Z0-9_-]{11})/.exec(String(ref));
-          matchId = matchUrl ? matchUrl[1] : '';
+          try {
+            var urlVideo = new URL(String(ref));
+            var host = urlVideo.hostname.toLowerCase();
+            if (host === 'youtu.be') matchId = urlVideo.pathname.split('/')[1] || '';
+            else if (host === 'youtube.com' || host === 'www.youtube.com' ||
+                     host === 'm.youtube.com' || host === 'www.youtube-nocookie.com') {
+              matchId = urlVideo.searchParams.get('v') ||
+                (urlVideo.pathname.match(/^\\/(?:embed|shorts|live)\\/([^/]+)/) || [])[1] || '';
+            }
+          } catch (_) {}
         }
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(matchId)) matchId = '';
         return matchId;
       }).filter(Boolean) : [];
       return {

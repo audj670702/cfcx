@@ -312,7 +312,7 @@
 
   Monitor.prototype.montarYoutube = function (c) {
     if (!c.playlist) { this.mensaje('Canal ' + c.nombre, 'Lista de reproducción por definir'); return; }
-    var src = 'https://www.youtube-nocookie.com/embed/videoseries' +
+    var src = 'https://www.youtube.com/embed/videoseries' +
       '?list=' + encodeURIComponent(c.playlist) +
       '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
       '&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&loop=1';
@@ -347,7 +347,7 @@
     };
     this.estado('loading', 'Cargando contenido…');
     var f = document.createElement('iframe');
-    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(v.id) +
+    f.src = 'https://www.youtube.com/embed/' + encodeURIComponent(v.id) +
       '?start=' + pos + '&autoplay=1&mute=' + (this.muted ? '1' : '0') +
       '&playsinline=1&rel=0&modestbranding=1&controls=0&enablejsapi=1';
     f.referrerPolicy = 'strict-origin-when-cross-origin';

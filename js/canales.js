@@ -28,27 +28,6 @@
       var playlist = String(item.playlistYoutube || item.playlist || '').trim();
       var idEnUrl = /[?&]list=([a-zA-Z0-9_-]+)/.exec(playlist);
       if (idEnUrl) playlist = idEnUrl[1];
-      // Las playlists internas llegan del endpoint público como una secuencia de IDs.
-      // No se consultan colecciones administrativas desde el navegador.
-      var origenPlaylist = String(item.origenPlaylist || 'YOUTUBE').trim().toUpperCase();
-      var videos = Array.isArray(item.videos) ? item.videos.map(function (v) {
-        var ref = typeof v === 'string' ? v : (v.youtubeId || v.videoId || v.referenciaVideo || '');
-        var matchId = /^[a-zA-Z0-9_-]{11}$/.test(String(ref)) ? String(ref) : '';
-        if (!matchId) {
-          try {
-            var urlVideo = new URL(String(ref));
-            var host = urlVideo.hostname.toLowerCase();
-            if (host === 'youtu.be') matchId = urlVideo.pathname.split('/')[1] || '';
-            else if (host === 'youtube.com' || host === 'www.youtube.com' ||
-                     host === 'm.youtube.com' || host === 'www.youtube-nocookie.com') {
-              matchId = urlVideo.searchParams.get('v') ||
-                (urlVideo.pathname.match(/^\\/(?:embed|shorts|live)\\/([^/]+)/) || [])[1] || '';
-            }
-          } catch (_) {}
-        }
-        if (!/^[a-zA-Z0-9_-]{11}$/.test(matchId)) matchId = '';
-        return matchId;
-      }).filter(Boolean) : [];
       return {
         codigo: codigo,
         numero: numero,
@@ -56,8 +35,6 @@
         tipo: tipo === 'VPS' ? 'hls' : 'youtube',
         url: tipo === 'VPS' && /^https:\/\//i.test(url) ? url : '',
         playlist: tipo === 'VIRTUAL' && /^[a-zA-Z0-9_-]{8,}$/.test(playlist) ? playlist : '',
-        origenPlaylist: tipo === 'VIRTUAL' && origenPlaylist === 'INTERNA' ? 'INTERNA' : 'YOUTUBE',
-        videos: tipo === 'VIRTUAL' && origenPlaylist === 'INTERNA' ? videos : [],
         espacio: item.espacio || null,
         orden: Number.isFinite(Number(item.orden)) ? Number(item.orden) : n
       };

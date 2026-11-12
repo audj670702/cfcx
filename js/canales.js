@@ -28,6 +28,18 @@
       var playlist = String(item.playlistYoutube || item.playlist || '').trim();
       var idEnUrl = /[?&]list=([a-zA-Z0-9_-]+)/.exec(playlist);
       if (idEnUrl) playlist = idEnUrl[1];
+      // Las playlists internas llegan del endpoint público como una secuencia de IDs.
+      // No se consultan colecciones administrativas desde el navegador.
+      var origenPlaylist = String(item.origenPlaylist || 'YOUTUBE').trim().toUpperCase();
+      var videos = Array.isArray(item.videos) ? item.videos.map(function (v) {
+        var ref = typeof v === 'string' ? v : (v.youtubeId || v.videoId || v.referenciaVideo || '');
+        var matchId = /^[a-zA-Z0-9_-]{11}$/.test(ref) ? ref : null;
+        if (!matchId) {
+          var matchUrl = /(?:youtu\\.be\\/|youtube(?:-nocookie)?\\.com\\/(?:watch\\?v=|embed\\/|shorts\\/|live\\/))([a-zA-Z0-9_-]{11})/.exec(String(ref));
+          matchId = matchUrl ? matchUrl[1] : '';
+        }
+        return matchId;
+      }).filter(Boolean) : [];
       return {
         codigo: codigo,
         numero: numero,
@@ -35,6 +47,8 @@
         tipo: tipo === 'VPS' ? 'hls' : 'youtube',
         url: tipo === 'VPS' && /^https:\/\//i.test(url) ? url : '',
         playlist: tipo === 'VIRTUAL' && /^[a-zA-Z0-9_-]{8,}$/.test(playlist) ? playlist : '',
+        origenPlaylist: tipo === 'VIRTUAL' && origenPlaylist === 'INTERNA' ? 'INTERNA' : 'YOUTUBE',
+        videos: tipo === 'VIRTUAL' && origenPlaylist === 'INTERNA' ? videos : [],
         espacio: item.espacio || null,
         orden: Number.isFinite(Number(item.orden)) ? Number(item.orden) : n
       };

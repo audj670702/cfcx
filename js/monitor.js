@@ -32,7 +32,7 @@
    *   canales: catálogo público TV Digital normalizado
    *   Cada canal VPS lleva su URL HLS propia (rutaHls en Panel TV).
    *   inicial: número de canal inicial ("01")
-   *   mostrarCanales: muestra la fila de canales y el enlace al Espacio
+   *   mostrarCanales: muestra el selector de canales
    */
   function Monitor(root, opts) {
     this.root = root;
@@ -87,8 +87,7 @@
           selector +
           '<button type="button" class="tv-btn" data-act="full" aria-label="Pantalla completa">' + ICON.full + '</button>' +
         '</div>' + menu +
-      '</div>' +
-      (this.mostrarCanales ? '<div data-role="espacio"></div>' : '');
+      '</div>';
 
     this.el = {
       console: this.root.querySelector('[data-role="console"]'),
@@ -105,8 +104,7 @@
       status: this.root.querySelector('[data-role="status"]'),
       statusText: this.root.querySelector('[data-role="status-text"]'),
       resume: this.root.querySelector('[data-act="resume"]'),
-      fullClose: this.root.querySelector('[data-act="exit-full"]'),
-      espacio: this.root.querySelector('[data-role="espacio"]')
+      fullClose: this.root.querySelector('[data-act="exit-full"]')
     };
 
     this.onClick = function (event) {
@@ -247,11 +245,6 @@
     else if (c.tipo === 'youtube') this.montarYoutube(c);
     else this.mensaje('Canal en preparación', 'Muy pronto en CFCX');
 
-    if (this.el.espacio) {
-      this.el.espacio.innerHTML = c.espacio
-        ? '<a class="link-arrow" href="#/espacio/' + esc(c.espacio) + '">Ir al Espacio ' + esc(c.nombre) + ' →</a>'
-        : '';
-    }
   };
 
   Monitor.prototype.montarHls = function (canal) {

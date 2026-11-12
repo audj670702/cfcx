@@ -1,11 +1,25 @@
-/* CFCX · Adaptador público de canales TV Digital · v2.0
+/* CFCX · Adaptador público de canales TV Digital · v2.1
    No hace consultas administrativas ni envía credenciales a Wix.
    Respeta el código CHXX; CH00 se agrega solo desde configuración de EO.
+   v2.1: canales virtuales con playlist del Panel TV (origen PLAYLIST_PANEL):
+   se conserva su programación (videos con duración) y el desfase con el reloj
+   del servidor para que todos los monitores vean el mismo video al mismo tiempo.
 */
 (function () {
   'use strict';
 
-  function listaCanonica(items, canalEO, senalesVpsRespaldo) {
+  function programaDe(item, desfaseMs) {
+    var prog = item && item.programacion;
+    if (!prog || !Array.isArray(prog.videos)) return null;
+    var origen = Date.parse(prog.cicloOrigen);
+    if (!Number.isFinite(origen)) return null;
+    var videos = prog.videos.map(function (v) {
+      return { id: String(v && v.id || '').trim(), titulo: String(v && v.titulo || '').slice(0, 200), duracion: Math.floor(Number(v && v.duracion) || 0) };
+    }).filter(function (v) { return /^[a-zA-Z0-9_-]{11}$/.test(v.id) && v.duracion > 0; });
+    return videos.length ? { videos: videos, origen: origen, desfase: Number(desfaseMs) || 0 } : null;
+  }
+
+  function listaCanonica(items, canalEO, senalesVpsRespaldo, desfaseMs) {
     if (!Array.isArray(items)) throw new Error('CATALOGO_INVALIDO');
     var vistos = {};
     var canales = items.map(function (item) {
@@ -35,6 +49,7 @@
         tipo: tipo === 'VPS' ? 'hls' : 'youtube',
         url: tipo === 'VPS' && /^https:\/\//i.test(url) ? url : '',
         playlist: tipo === 'VIRTUAL' && /^[a-zA-Z0-9_-]{8,}$/.test(playlist) ? playlist : '',
+        programa: tipo === 'VIRTUAL' ? programaDe(item, desfaseMs) : null,
         espacio: item.espacio || null,
         orden: Number.isFinite(Number(item.orden)) ? Number(item.orden) : n
       };
@@ -96,7 +111,9 @@
         if (!datos || datos.ok !== true || !Array.isArray(datos.canales)) {
           throw new Error('RESPUESTA_INVALIDA');
         }
-        var canales = listaCanonica(datos.canales, cfg.canalEO, cfg.senalesVpsRespaldo);
+        var servidor = Date.parse(datos.ahora);
+        var desfase = Number.isFinite(servidor) ? servidor - Date.now() : 0;
+        var canales = listaCanonica(datos.canales, cfg.canalEO, cfg.senalesVpsRespaldo, desfase);
         // Una respuesta correcta sin canales significa que no hay canales activos.
         guardarCache(datos.canales);
         return { canales: canales, origen: 'PANEL_TV' };

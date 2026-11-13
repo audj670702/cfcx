@@ -565,3 +565,26 @@ body.cfcx-tv-fs .tv-fs-close { z-index: 10000; }
   white-space:nowrap;
 }
 @media(max-width:360px) {.app-footer{flex-wrap:wrap;}}
+
+/* REVISTA v0.2.10: presentación editorial CMS y audio opcional */
+.revista-home-cover { display:block; width:100%; min-width:0; text-decoration:none; }
+.revista-home-copy { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
+.revista-home-copy .eyebrow { margin:0; }
+.revista-home-copy h3 { margin:0; }
+.revista-home-copy p.muted { margin:0; line-height:1.55; }
+.revista-home-copy .link-arrow { margin-top:3px; }
+.revista-audio-compact { display:grid; gap:7px; width:100%; min-width:0; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+.revista-audio-label { font-size:12px; font-weight:650; color:var(--text); }
+.revista-audio-compact audio { display:block; width:100%; max-width:100%; min-width:0; height:38px; }
+.revista-destacada-copy { width:min(100%,520px); min-width:0; display:grid; justify-items:start; gap:10px; }
+.revista-destacada-copy .eyebrow,.revista-destacada-copy p.muted { margin:0; }
+.revista-destacada-copy h3 { font:700 clamp(22px,3vw,30px)/1.2 Georgia,serif; margin:0; }
+.revista-destacada-copy p.muted { line-height:1.5; }
+#revistaDestacada .revista-audio-compact { width:100%; }
+@media(max-width:540px) {
+  .revista-home-feature { grid-template-columns:minmax(0,1fr); gap:14px; align-items:start; }
+  .revista-home-cover { max-width:200px; justify-self:center; }
+  .revista-home-copy { width:100%; }
+  .revista-home-feature h3 { font-size:22px; }
+  .revista-home-feature p.muted { display:block; font-size:13px; }
+}

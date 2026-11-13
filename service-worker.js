@@ -1,17 +1,17 @@
 /* App CFCX · service worker
    Guarda la "cáscara" de la app para abrir rápido e instalarla.
    Nunca guarda la señal en vivo (HLS) ni YouTube. */
-const CACHE = 'cfcx-v12';
+const CACHE = 'cfcx-v13';
 const SHELL = [
   './',
   './index.html',
-  './css/app.css?v=0.2.5',
-  './js/config.js?v=0.2.5',
-  './js/install.js?v=0.2.5',
+  './css/app.css?v=0.2.9',
+  './js/config.js?v=0.2.9',
+  './js/install.js?v=0.2.9',
   './js/store.js',
   './js/canales.js',
   './js/monitor.js',
-  './js/app.js?v=0.2.5',
+  './js/app.js?v=0.2.9',
   './data/revista-inicial.json',
   './manifest.webmanifest',
   './assets/icon.svg',

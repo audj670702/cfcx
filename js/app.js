@@ -177,6 +177,13 @@
     var d = new Date(a.fecha || a.fechaPublicacion || '');
     return isNaN(d.getTime()) ? '' : d.toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric', timeZone:'UTC'});
   }
+  function audioRevista(a) {
+    var src = urlExterna(a && a.audioUrl);
+    if (!src) return '';
+    return '<div class="revista-audio-compact"><span class="revista-audio-label">Escuchar artículo</span>' +
+      '<audio controls preload="none" aria-label="Escuchar artículo: ' + esc(a.titulo || '') +
+      '" src="' + esc(src) + '">Tu navegador no admite reproducción de audio.</audio></div>';
+  }
   function portadaRevista(a, variante) {
     var foto = urlExterna(a.portada);
     var arteFinal = urlExterna(a.portadaDisenada);
@@ -208,13 +215,15 @@
   }
 
   V.inicio = function () {
-    var recientes = (DATA.articulos || []).slice(0, 5);
+    var recientes = (DATA.articulos || []).filter(function(a){return a.enBanner !== false;}).slice(0,5);
     view.innerHTML =
       '<section class="section"><div id="monitor"></div><div id="canalesEstado" class="muted" style="font-size:12px;padding-top:8px"></div></section>' +
       '<section class="section revista-home"><div class="revista-head"><div><p class="eyebrow">PUBLICACIÓN EDITORIAL</p><h2 class="h1">REVISTA CFCX</h2></div></div>' +
       (recientes.length
-      ? '<div id="inicioRevista" role="region" aria-label="Últimas cinco publicaciones de REVISTA">' + recientes.map(function(x,i){return '<a class="revista-home-feature revista-home-slide" data-home-slide="'+i+'" '+(i?'hidden':'')+' '+atributosEnlaceArticulo(x)+'>'+
-        portadaRevista(x,'home')+'<div><p class="eyebrow">'+esc(x.tipo || 'ARTÍCULO')+'</p><h3>'+esc(x.titulo)+'</h3><p class="muted">'+esc(x.resumen || '')+'</p><span class="link-arrow">Leer artículo completo '+I.chev+'</span></div></a>';}).join('') +
+      ? '<div id="inicioRevista" role="region" aria-label="Últimas cinco publicaciones de REVISTA">' + recientes.map(function(x,i){return '<div class="revista-home-feature revista-home-slide" data-home-slide="'+i+'" '+(i?'hidden':'')+'>'+
+        '<a class="revista-home-cover" '+atributosEnlaceArticulo(x)+' aria-label="Leer artículo completo: '+esc(x.titulo)+'">'+portadaRevista(x,'home')+'</a>'+
+        '<div class="revista-home-copy"><p class="eyebrow">'+esc(x.tipo || 'ARTÍCULO')+'</p><h3>'+esc(x.titulo)+'</h3><p class="muted">'+esc(x.resumen || '')+'</p>'+
+        audioRevista(x)+'<a class="link-arrow" '+atributosEnlaceArticulo(x)+'>Leer artículo completo '+I.chev+'</a></div></div>';}).join('') +
         (recientes.length>1?'<div class="revista-home-controls"><button type="button" data-home-step="-1" aria-label="Artículo anterior">'+I.back+'</button><div class="revista-puntos">'+recientes.map(function(x,i){return '<button type="button" data-home-index="'+i+'" aria-label="Mostrar artículo '+(i+1)+': '+esc(x.titulo)+'" aria-pressed="'+(i===0)+'"></button>';}).join('')+'</div><button type="button" data-home-step="1" aria-label="Artículo siguiente">'+I.chev+'</button><button class="revista-pausa" type="button" id="inicioRevistaPausa">Pausar</button></div>':'')+'</div>'
       : '<div class="revista-vacia"><strong>Próxima edición de REVISTA CFCX</strong><p>Las publicaciones aparecerán aquí cuando estén disponibles en Wix Blog.</p></div>') +
       '<div class="revista-explorar"><a class="btn" href="#/revista">Explorar más '+I.chev+'</a></div></section>';
@@ -234,6 +243,7 @@
       }
       zona.addEventListener('click',function(e){var paso=e.target.closest('[data-home-step]'),punto=e.target.closest('[data-home-index]');if(paso)elegir(indice+Number(paso.dataset.homeStep),true);if(punto)elegir(Number(punto.dataset.homeIndex),true);});
       zona.addEventListener('pointerdown',function(e){if(e.target!==pausa)detener();});
+      zona.addEventListener('play',function(e){if(e.target.tagName==='AUDIO')detener();},true);
       zona.addEventListener('focusin',function(e){if(e.target!==pausa)detener();});
       zona.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();elegir(indice+(e.key==='ArrowRight'?1:-1),true);}});
       pausa.onclick=function(){pausado=!pausado;pintarPausa();};pintarPausa();
@@ -609,15 +619,14 @@
 
   // El catálogo es público y filtrado en el backend de Wix; nunca exponer tokens.
   function cargarRevista() {
-    // Wix Blog es la fuente editorial. Mientras se publica su endpoint, leer
-    // la primera entrada capturada de una publicación real; nunca el catálogo
-    // de ejemplos ni borradores. El servicio live tendrá prioridad al activarse.
-    var fuente = CFG.revistaApiUrl || CFG.revistaInicialUrl;
-    if (!fuente) return Promise.resolve({ articulos: [] });
-    return cargar(fuente).then(function (x) {
-      if (!x || !Array.isArray(x.articulos)) throw new Error('REVISTA_FORMATO');
-      return x;
-    }).catch(function () { return { articulos: [], error: true }; });
+    // Servicio de fichas aprobadas. Respeta la lista vacía cuando el CMS no publica nada.
+    function validar(x){if (!x || !Array.isArray(x.articulos)) throw new Error('REVISTA_FORMATO');return x;}
+    if (!CFG.revistaApiUrl) return CFG.revistaInicialUrl ? cargar(CFG.revistaInicialUrl).then(validar) : Promise.resolve({articulos:[]});
+    return cargar(CFG.revistaApiUrl).then(validar).catch(function(){
+      if (!CFG.revistaInicialUrl) return {articulos:[],error:true};
+      return cargar(CFG.revistaInicialUrl).then(validar).then(function(x){x.respaldo=true;return x;})
+        .catch(function(){return {articulos:[],error:true};});
+    });
   }
   pintarBotonTema();
   pintarSesion();

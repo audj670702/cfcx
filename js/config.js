@@ -3,7 +3,7 @@
 */
 window.CFCX_CONFIG = {
   // Versión visible en la barra superior. Incrementar en cada publicación.
-  version: 'v0.2.9',
+  version: 'v0.2.10',
   canalesPublicosUrl: 'https://www.scad.mx/_functions/tvdCanales',
   // Señales VPS de contingencia tomadas de la configuración confirmada en Panel TV.
   // Solo se usan cuando tvdCanales no proporciona una URL HLS válida.
@@ -24,8 +24,8 @@ window.CFCX_CONFIG = {
     articulos: './data/articulos.json',
     cupones: './data/cupones.json'
   },
-  // Servicio público de solo lectura Wix Blog; activar tras validarlo.
-  revistaApiUrl: null,
+  // Servicio editorial Wix CMS, únicamente fichas aprobadas.
+  revistaApiUrl: 'https://www.scad.mx/_functions/cfcxRevista',
   // Portadas y enlaces a Wix Blog; hasta activar el endpoint público se usa la primera entrada.
   revistaInicialUrl: './data/revista-inicial.json',
   flyerIntervalo: 5

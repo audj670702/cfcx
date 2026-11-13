@@ -214,7 +214,7 @@
       '<section class="section revista-home"><div class="revista-head"><div><p class="eyebrow">PUBLICACIÓN EDITORIAL</p><h2 class="h1">REVISTA CFCX</h2></div></div>' +
       (recientes.length
       ? '<div id="inicioRevista" role="region" aria-label="Últimas cinco publicaciones de REVISTA">' + recientes.map(function(x,i){return '<a class="revista-home-feature revista-home-slide" data-home-slide="'+i+'" '+(i?'hidden':'')+' '+atributosEnlaceArticulo(x)+'>'+
-        portadaRevista(x,'home')+'<div><p class="eyebrow">'+esc(x.tipo || 'ARTÍCULO')+'</p><h3>'+esc(x.titulo)+'</h3><p class="muted">'+esc(x.resumen || '')+'</p><span class="link-arrow">Leer en Wix Blog '+I.chev+'</span></div></a>';}).join('') +
+        portadaRevista(x,'home')+'<div><p class="eyebrow">'+esc(x.tipo || 'ARTÍCULO')+'</p><h3>'+esc(x.titulo)+'</h3><p class="muted">'+esc(x.resumen || '')+'</p><span class="link-arrow">Leer artículo completo '+I.chev+'</span></div></a>';}).join('') +
         (recientes.length>1?'<div class="revista-home-controls"><button type="button" data-home-step="-1" aria-label="Artículo anterior">'+I.back+'</button><div class="revista-puntos">'+recientes.map(function(x,i){return '<button type="button" data-home-index="'+i+'" aria-label="Mostrar artículo '+(i+1)+': '+esc(x.titulo)+'" aria-pressed="'+(i===0)+'"></button>';}).join('')+'</div><button type="button" data-home-step="1" aria-label="Artículo siguiente">'+I.chev+'</button><button class="revista-pausa" type="button" id="inicioRevistaPausa">Pausar</button></div>':'')+'</div>'
       : '<div class="revista-vacia"><strong>Próxima edición de REVISTA CFCX</strong><p>Las publicaciones aparecerán aquí cuando estén disponibles en Wix Blog.</p></div>') +
       '<div class="revista-explorar"><a class="btn" href="#/revista">Explorar más '+I.chev+'</a></div></section>';
@@ -325,7 +325,7 @@
     function pintar(animar){
       var x=todos[indice],destino=document.getElementById('revistaDestacada');
       destino.innerHTML='<a '+atributosEnlaceArticulo(x)+' aria-label="Abrir artículo en Wix Blog: '+esc(x.titulo)+'">'+portadaRevista(x,'grande')+'</a>' +
-        (enlaceArticulo(x) ? '<a class="link-arrow" '+atributosEnlaceArticulo(x)+'>Leer en Wix Blog '+I.chev+'</a>' : '');
+        (enlaceArticulo(x) ? '<a class="link-arrow" '+atributosEnlaceArticulo(x)+'>Leer artículo completo '+I.chev+'</a>' : '');
       if(animar && !reducido && destino.animate) destino.animate([{opacity:.3,transform:'translateX(8px)'},{opacity:1,transform:'translateX(0)'}],{duration:350});
       document.getElementById('revistaCuenta').textContent=(indice+1)+' de '+todos.length+' · '+x.titulo;
       document.getElementById('revistaPuntos').innerHTML=todos.slice(0,5).map(function(p,i){return '<button type="button" data-elegir="'+i+'" aria-label="Portada '+(i+1)+': '+esc(p.titulo)+'" aria-pressed="'+(indice===i)+'"></button>';}).join('');

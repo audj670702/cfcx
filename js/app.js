@@ -251,7 +251,7 @@
       limpieza.push(function(){clearInterval(timerInicio);});
     }
     var mon = new window.CFCXMonitor(document.getElementById('monitor'), {
-      canales: DATA.canales, inicial: '01', mostrarCanales: true
+      canales: DATA.canales, mostrarCanales: true
     });
     monitorActual = mon;
     limpieza.push(function () { if (monitorActual === mon) monitorActual = null; mon.destroy(); });

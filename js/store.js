@@ -82,6 +82,17 @@
       return nuevo;
     },
 
+    // ----- Canal predeterminado elegido por el usuario (código CHXX).
+    // Si no existe o el canal ya no está activo, el monitor usa la regla SYS.
+    getCanalPredeterminado: function () {
+      var c = get('canalPredeterminado', null);
+      return typeof c === 'string' && /^CH\d{2,}$/.test(c) ? c : null;
+    },
+    setCanalPredeterminado: function (codigo) {
+      if (typeof codigo === 'string' && /^CH\d{2,}$/.test(codigo)) set('canalPredeterminado', codigo);
+    },
+    quitarCanalPredeterminado: function () { remove('canalPredeterminado'); },
+
     // ----- Puntos de Arcade (reservado para fase de RIAs)
     getPuntos: function () { return get('puntos', 0); }
   };

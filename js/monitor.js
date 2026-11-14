@@ -26,6 +26,34 @@
     });
   }
 
+  function indiceDeNumero(canales, numero) {
+    for (var i = 0; i < canales.length; i++) {
+      if (canales[i].numero === numero) return i;
+    }
+    return 0;
+  }
+
+  /*
+   * Canal inicial al abrir el monitor:
+   *  1) Canal elegido por el usuario (USR), si sigue activo en el catálogo.
+   *  2) SYS: CH00 si existe (configuración de la EO).
+   *  3) SYS: CH01 si no hay CH00.
+   *  4) Primer canal disponible.
+   */
+  function indicePredeterminado(canales) {
+    var store = window.CFCX_STORE;
+    var pref = store && store.getCanalPredeterminado ? store.getCanalPredeterminado() : null;
+    if (pref) {
+      for (var p = 0; p < canales.length; p++) {
+        if (canales[p].codigo === pref) return p;
+      }
+    }
+    for (var c = 0; c < canales.length; c++) {
+      if (canales[c].codigo === 'CH00') return c;
+    }
+    return indiceDeNumero(canales, '01');
+  }
+
   /**
    * @param {HTMLElement} root  contenedor donde se dibuja el monitor
    * @param {object} opts
@@ -42,11 +70,7 @@
     this.hls = null;
     this.media = null;
     this.fullscreenFallback = false;
-    var idx = 0;
-    for (var i = 0; i < this.canales.length; i++) {
-      if (this.canales[i].numero === opts.inicial) idx = i;
-    }
-    this.idx = idx;
+    this.idx = opts.inicial ? indiceDeNumero(this.canales, opts.inicial) : indicePredeterminado(this.canales);
     this.render();
     if (this.canales.length) this.sintonizar(this.idx, false);
     else this.mensaje('Sin canales activos', 'El catálogo no tiene canales disponibles.');
@@ -59,6 +83,7 @@
           '<div class="tv-options-head"><strong>Canales</strong>' +
             '<button type="button" class="tv-options-close" data-act="close-menu" aria-label="Cerrar menú">' + ICON.close + '</button></div>' +
           '<div class="tv-options-list" data-role="channel-list"></div>' +
+          '<p class="tv-options-foot" data-role="menu-foot"></p>' +
         '</div>'
       : '';
     var selector = this.mostrarCanales
@@ -101,6 +126,7 @@
       menu: this.root.querySelector('[data-role="options"]'),
       menuTrigger: this.root.querySelector('[data-act="channels"]'),
       channelList: this.root.querySelector('[data-role="channel-list"]'),
+      menuFoot: this.root.querySelector('[data-role="menu-foot"]'),
       status: this.root.querySelector('[data-role="status"]'),
       statusText: this.root.querySelector('[data-role="status-text"]'),
       resume: this.root.querySelector('[data-act="resume"]'),
@@ -117,6 +143,9 @@
       else if (action === 'full') self.pantallaCompleta();
       else if (action === 'exit-full') self.cerrarPantallaCompleta();
       else if (action === 'resume') self.reanudar();
+      else if (button.hasAttribute('data-pin')) {
+        self.alternarPredeterminado(Number(button.getAttribute('data-pin')));
+      }
       else if (button.hasAttribute('data-ch')) {
         var index = Number(button.getAttribute('data-ch'));
         self.cerrarMenu();
@@ -142,14 +171,42 @@
   Monitor.prototype.pintarMenu = function () {
     if (!this.el.channelList) return;
     var self = this;
+    var pref = this.preferido();
     this.el.channelList.innerHTML = this.canales.map(function (c, i) {
-      return '<button type="button" class="tv-channel-option' + (i === self.idx ? ' is-active' : '') +
+      var fijado = pref === c.codigo;
+      return '<div class="tv-channel-row">' +
+        '<button type="button" class="tv-channel-option' + (i === self.idx ? ' is-active' : '') +
         '" data-ch="' + i + '" aria-pressed="' + (i === self.idx) + '">' +
         '<span class="tv-option-code">CH ' + esc(c.numero) + '</span>' +
         '<span class="tv-option-name">' + esc(c.nombre) + '</span>' +
         '<span class="tv-option-check" aria-hidden="true">' + (i === self.idx ? '✓' : '') + '</span>' +
-        '</button>';
+        '</button>' +
+        '<button type="button" class="tv-pin' + (fijado ? ' is-pinned' : '') + '" data-pin="' + i +
+        '" aria-pressed="' + fijado + '" aria-label="' +
+        (fijado ? 'Quitar CH ' + esc(c.numero) + ' como predeterminado' : 'Fijar CH ' + esc(c.numero) + ' como predeterminado') +
+        '" title="' + (fijado ? 'Quitar predeterminado' : 'Fijar como predeterminado') + '">★</button>' +
+        '</div>';
     }).join('') || '<p class="tv-options-empty">Sin canales disponibles</p>';
+    if (this.el.menuFoot) {
+      var fijo = this.canales.filter(function (c) { return c.codigo === pref; })[0];
+      this.el.menuFoot.textContent = fijo
+        ? 'Predeterminado: CH ' + fijo.numero + ' (elegido por ti)'
+        : 'Predeterminado: ' + (this.canales.some(function (c) { return c.codigo === 'CH00'; }) ? 'CH 00' : 'CH 01') + ' (sistema)';
+    }
+  };
+
+  Monitor.prototype.preferido = function () {
+    var store = window.CFCX_STORE;
+    return store && store.getCanalPredeterminado ? store.getCanalPredeterminado() : null;
+  };
+
+  Monitor.prototype.alternarPredeterminado = function (index) {
+    var store = window.CFCX_STORE;
+    var canal = this.canales[index];
+    if (!canal || !store || !store.setCanalPredeterminado) return;
+    if (this.preferido() === canal.codigo) store.quitarCanalPredeterminado();
+    else store.setCanalPredeterminado(canal.codigo);
+    this.pintarMenu();
   };
 
   Monitor.prototype.alternarMenu = function () {

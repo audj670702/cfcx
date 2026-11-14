@@ -232,6 +232,7 @@
   Monitor.prototype.reanudar = function () {
     if (this.el.resume) this.el.resume.hidden = true;
     var v = this.media;
+    if (v && v.tagName === 'IFRAME') { this.pedirReproduccion(v); return; }
     if (v && v.tagName === 'VIDEO') {
       var result = v.play();
       if (result && result.catch) {
@@ -264,6 +265,7 @@
 
   Monitor.prototype.limpiarMedia = function () {
     clearTimeout(this._programaT); this._programaT = null;
+    clearTimeout(this._vigilaT); clearTimeout(this._reintentoT);
     if (this.hls) { try { this.hls.destroy(); } catch (e) {} this.hls = null; }
     if (this.media && this.media.tagName === 'VIDEO') {
       try { this.media.pause(); this.media.removeAttribute('src'); this.media.load(); } catch (e) {}
@@ -378,7 +380,7 @@
     f.src = src;
     f.referrerPolicy = 'strict-origin-when-cross-origin';
     var self = this;
-    f.addEventListener('load', function () { if (self.media === f) self.estado('', ''); });
+    this.vigilarReproduccion(f);
     f.title = 'Canal ' + c.nombre;
     f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     f.setAttribute('allowfullscreen', '');
@@ -411,12 +413,7 @@
     f.title = 'Canal ' + c.nombre;
     f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     f.setAttribute('allowfullscreen', '');
-    f.addEventListener('load', function () {
-      if (self.media !== f) return;
-      self.estado('', '');
-      // Pide a YouTube que informe errores (video eliminado, privado o no insertable).
-      try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'cfcx' }), '*'); } catch (e) {}
-    });
+    this.vigilarReproduccion(f);
     this.el.media.appendChild(f);
     this.media = f;
     this.el.now.textContent = c.nombre + (v.titulo ? ' · ' + v.titulo : '');
@@ -439,6 +436,47 @@
     }
     this._restante = restante;
     this._programaT = setTimeout(siguiente, restante);
+  };
+
+  // Pide a YouTube reproducir en silencio y solicita informes de estado.
+  Monitor.prototype.pedirReproduccion = function (f) {
+    var cmd = function (func) {
+      try { f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: [] }), '*'); } catch (e) {}
+    };
+    try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'cfcx' }), '*'); } catch (e) {}
+    cmd('mute');
+    cmd('playVideo');
+  };
+
+  // Canales YouTube: arrancan solos en silencio. Si YouTube no confirma la
+  // reproducción, se ofrece el botón "Reproducir señal" (no se pide play en los canales virtuales por defecto).
+  Monitor.prototype.vigilarReproduccion = function (f) {
+    var self = this;
+    this._sonando = false;
+    clearTimeout(this._vigilaT); clearTimeout(this._reintentoT);
+    f.addEventListener('load', function () {
+      if (self.media !== f) return;
+      self.estado('', '');
+      self.pedirReproduccion(f);
+      self._reintentoT = setTimeout(function () { if (self.media === f && !self._sonando) self.pedirReproduccion(f); }, 1500);
+      self._vigilaT = setTimeout(function () {
+        if (self.media !== f || self._sonando) return;
+        if (self.el.resume) { self.el.resume.textContent = '▶ Reproducir señal'; self.el.resume.hidden = false; }
+      }, 6000);
+    });
+    if (!this._onYtEstado) {
+      this._onYtEstado = function (event) {
+        var m = self.media;
+        if (!m || m.tagName !== 'IFRAME' || event.source !== m.contentWindow) return;
+        var d = null;
+        try { d = typeof event.data === 'string' ? JSON.parse(event.data) : event.data; } catch (e) { return; }
+        if (d && d.event === 'infoDelivery' && d.info && d.info.playerState === 1) {
+          self._sonando = true;
+          if (self.el.resume) self.el.resume.hidden = true;
+        }
+      };
+      window.addEventListener('message', this._onYtEstado);
+    }
   };
 
   Monitor.prototype.alternarSonido = function () {
@@ -496,6 +534,7 @@
 
   Monitor.prototype.destroy = function () {
     if (this._onYtMensaje) { window.removeEventListener('message', this._onYtMensaje); this._onYtMensaje = null; }
+    if (this._onYtEstado) { window.removeEventListener('message', this._onYtEstado); this._onYtEstado = null; }
     this.cerrarPantallaCompleta();
     this.limpiarMedia();
     this.root.removeEventListener('click', this.onClick);

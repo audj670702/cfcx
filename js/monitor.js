@@ -467,8 +467,21 @@
       try { f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: [] }), '*'); } catch (e) {}
     };
     try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'cfcx' }), '*'); } catch (e) {}
-    cmd('mute');
+    // Respeta el sonido que eligió el usuario también tras un cambio de playlist.
+    this._pedidoT = Date.now();
+    cmd(this.muted ? 'mute' : 'unMute');
     cmd('playVideo');
+  };
+
+  // El navegador bloqueó el sonido en el video nuevo: el monitor lo muestra como silenciado.
+  Monitor.prototype.reflejarSilencio = function () {
+    this.muted = true;
+    if (this.el.sound) {
+      this.el.sound.innerHTML = ICON.muted;
+      this.el.sound.classList.remove('on');
+      this.el.sound.setAttribute('aria-label', 'Activar sonido');
+    }
+    this.estado('action', 'Pulsa el botón de sonido para escuchar');
   };
 
   // Canales YouTube: arrancan solos en silencio. Si YouTube no confirma la
@@ -493,9 +506,14 @@
         if (!m || m.tagName !== 'IFRAME' || event.source !== m.contentWindow) return;
         var d = null;
         try { d = typeof event.data === 'string' ? JSON.parse(event.data) : event.data; } catch (e) { return; }
-        if (d && d.event === 'infoDelivery' && d.info && d.info.playerState === 1) {
-          self._sonando = true;
-          if (self.el.resume) self.el.resume.hidden = true;
+        if (d && d.event === 'infoDelivery' && d.info) {
+          if (d.info.playerState === 1) {
+            self._sonando = true;
+            if (self.el.resume) self.el.resume.hidden = true;
+          }
+          // Reproduce, pero el navegador lo tiene silenciado: se refleja en el botón.
+          // Se ignora el primer segundo tras pedir el sonido: YouTube tarda en aplicarlo.
+          if (d.info.muted === true && !self.muted && Date.now() - (self._pedidoT || 0) > 3000) self.reflejarSilencio();
         }
       };
       window.addEventListener('message', this._onYtEstado);

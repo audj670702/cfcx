@@ -399,12 +399,7 @@
     while (pos >= p.videos[i].duracion) { pos -= p.videos[i].duracion; i += 1; }
     var v = p.videos[i];
     var restante = (v.duracion - pos) * 1000 + 500;
-    var siguiente = function () {
-      var actual = self.canales[self.idx];
-      if (!actual || actual.codigo !== c.codigo) return;
-      self.limpiarMedia();
-      self.montarPrograma(actual);
-    };
+    var siguiente = function () { self.avanzarPrograma(c); };
     this.estado('loading', 'Cargando contenido…');
     var f = document.createElement('iframe');
     f.src = 'https://www.youtube.com/embed/' + encodeURIComponent(v.id) +
@@ -440,6 +435,30 @@
     }
     this._restante = restante;
     this._programaT = setTimeout(siguiente, restante);
+  };
+
+  // Cambio de video dentro de un programa: se carga el siguiente en el mismo
+  // iframe (sin recargarlo), así no hay corte visible ni se pierde el sonido.
+  Monitor.prototype.avanzarPrograma = function (c) {
+    var self = this;
+    var actual = this.canales[this.idx];
+    if (!actual || actual.codigo !== c.codigo) return;
+    var f = this.media;
+    if (!f || f.tagName !== 'IFRAME') { this.limpiarMedia(); this.montarPrograma(actual); return; }
+    var p = actual.programa;
+    var total = p.videos.reduce(function (t, v) { return t + v.duracion; }, 0);
+    var pos = Math.floor((Date.now() + p.desfase - p.origen) / 1000) % total;
+    if (pos < 0) pos += total;
+    var i = 0;
+    while (pos >= p.videos[i].duracion) { pos -= p.videos[i].duracion; i += 1; }
+    var v = p.videos[i];
+    var restante = (v.duracion - pos) * 1000 + 500;
+    this._restante = restante;
+    this._programaT = setTimeout(function () { self.avanzarPrograma(actual); }, restante);
+    this.el.now.textContent = actual.nombre + (v.titulo ? ' · ' + v.titulo : '');
+    try {
+      f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'loadVideoById', args: [v.id, pos] }), '*');
+    } catch (e) {}
   };
 
   // Pide a YouTube reproducir en silencio y solicita informes de estado.

@@ -400,9 +400,10 @@
     var v = p.videos[i];
     var restante = (v.duracion - pos) * 1000 + 500;
     var siguiente = function () {
-      if (self.canales[self.idx] !== c) return;
+      var actual = self.canales[self.idx];
+      if (!actual || actual.codigo !== c.codigo) return;
       self.limpiarMedia();
-      self.montarPrograma(c);
+      self.montarPrograma(actual);
     };
     this.estado('loading', 'Cargando contenido…');
     var f = document.createElement('iframe');
@@ -429,7 +430,10 @@
           self.limpiarMedia();
           self.mensaje('Programa no disponible', 'El siguiente programa inicia en breve');
           var canal = self.canales[self.idx];
-          self._programaT = setTimeout(function () { if (self.canales[self.idx] === canal) { self.limpiarMedia(); self.estado('', ''); self.montarPrograma(canal); } }, self._restante || 5000);
+          self._programaT = setTimeout(function () {
+            var vigente = self.canales[self.idx];
+            if (vigente && canal && vigente.codigo === canal.codigo) { self.limpiarMedia(); self.estado('', ''); self.montarPrograma(vigente); }
+          }, self._restante || 5000);
         }
       };
       window.addEventListener('message', this._onYtMensaje);
@@ -517,8 +521,25 @@
     }
   };
 
+  // Firma de lo que se reproduce; el desfase del reloj no cuenta como cambio.
+  function firmaCanal(c) {
+    var p = c.programa;
+    return [c.codigo, c.numero, c.nombre, c.tipo, c.url, c.playlist,
+      p ? p.origen + '|' + p.videos.map(function (v) { return v.id + ':' + v.duracion; }).join(',') : ''].join('#');
+  }
+
   Monitor.prototype.actualizarCanales = function (canales) {
-    var codigoActual = this.canales[this.idx] && this.canales[this.idx].codigo;
+    var actual = this.canales[this.idx];
+    var nuevos = Array.isArray(canales) ? canales : [];
+    var nuevoIdx = actual ? nuevos.findIndex(function (c) { return c.codigo === actual.codigo; }) : -1;
+    // Sin cambios en el canal en pantalla: no se reinicia el video ni el sonido.
+    if (nuevoIdx >= 0 && firmaCanal(actual) === firmaCanal(nuevos[nuevoIdx])) {
+      this.canales = nuevos;
+      this.idx = nuevoIdx;
+      this.pintarMenu();
+      return;
+    }
+    var codigoActual = actual && actual.codigo;
     this.limpiarMedia();
     this.cerrarPantallaCompleta();
     this.root.removeEventListener('click', this.onClick);
